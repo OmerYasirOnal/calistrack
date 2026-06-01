@@ -73,6 +73,21 @@ void main() {
       final history = exerciseHistory(workouts, 'easy_run');
       expect(history.single.totalDistanceMeters, 5000);
     });
+
+    test('aggregates timed-effort duration', () {
+      final workouts = [
+        _w('2026-06-01', [
+          _le('intervals', const [
+            LoggedSet(reps: 1, durationSeconds: 60),
+            LoggedSet(reps: 1, durationSeconds: 60),
+          ]),
+        ]),
+      ];
+      expect(
+        exerciseHistory(workouts, 'intervals').single.totalDurationSeconds,
+        120,
+      );
+    });
   });
 
   group('overallStats', () {

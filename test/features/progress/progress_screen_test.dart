@@ -73,4 +73,13 @@ void main() {
     expect(find.text('Volume'), findsOneWidget);
     expect(find.byType(LineChart), findsOneWidget);
   });
+
+  testWidgets('a single session shows the "log again" hint, not a chart',
+      (tester) async {
+    final workouts = FakeWorkoutRepository()..saved.add(_w('2026-06-02', 12));
+    await tester.pumpWidget(_app(workouts));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Log this movement again'), findsOneWidget);
+    expect(find.byType(LineChart), findsNothing);
+  });
 }

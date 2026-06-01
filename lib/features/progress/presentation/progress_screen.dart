@@ -26,8 +26,8 @@ import '../data/progress_repository.dart';
           value: (p) => p.totalDistanceMeters.toDouble()
         ),
       ExerciseType.time => (
-          label: 'Sets',
-          value: (p) => p.totalReps.toDouble()
+          label: 'Duration (s)',
+          value: (p) => p.totalDurationSeconds.toDouble()
         ),
     };
 
@@ -77,7 +77,9 @@ class _ProgressBodyState extends ConsumerState<_ProgressBody> {
               : _ExerciseChart(
                   ids: ids,
                   library: library,
-                  selectedId: _selectedId ?? ids.first,
+                  // guard against a selection that's no longer in the list
+                  selectedId:
+                      ids.contains(_selectedId) ? _selectedId! : ids.first,
                   onSelect: (id) => setState(() => _selectedId = id),
                 ),
         ),
@@ -99,10 +101,27 @@ class _StatsCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _Stat(value: '${stats.currentStreakDays}', label: 'day streak'),
-            _Stat(value: '${stats.thisWeekWorkouts}', label: 'this week'),
-            _Stat(value: '${stats.totalWorkouts}', label: 'workouts'),
-            _Stat(value: stats.totalVolume.toStringAsFixed(0), label: 'volume'),
+            Expanded(
+              child: _Stat(
+                value: '${stats.currentStreakDays}',
+                label: 'day streak',
+              ),
+            ),
+            Expanded(
+              child: _Stat(
+                value: '${stats.thisWeekWorkouts}',
+                label: 'this week',
+              ),
+            ),
+            Expanded(
+              child: _Stat(value: '${stats.totalWorkouts}', label: 'workouts'),
+            ),
+            Expanded(
+              child: _Stat(
+                value: stats.totalVolume.toStringAsFixed(0),
+                label: 'volume',
+              ),
+            ),
           ],
         ),
       ),
@@ -188,7 +207,7 @@ class _ExerciseChart extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 40,
+          height: 48,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: ids.length,
@@ -264,6 +283,7 @@ class _LineChart extends StatelessWidget {
 
     return LineChart(
       LineChartData(
+        minY: 0, // anchor at zero — avoids a collapsed axis when values match
         gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
         titlesData: const FlTitlesData(

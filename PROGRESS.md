@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M4 T15 Progress repository [branch feat/calistrack-m4-t15-progress-repo]
+- **Task:** aggregate logged workouts into progress insight.
+- **Added:** `features/progress/data/progress_repository.dart` — pure
+  `exerciseHistory()` (chart-ready per-exercise series: reps/volume/top-weight/
+  best-hold/distance, oldest→newest) + `overallStats()` (totals, this-week,
+  consecutive-day streak ending today/yesterday). `ProgressRepository` wraps
+  `WorkoutRepository.recent`; providers `overallStatsProvider`,
+  `exercisesWithHistoryProvider`, `exerciseHistoryProvider.family`.
+- **Tests:** pure aggregation (history ordering + aggregates, cardio distance),
+  stats + streak edge cases (empty / today-yesterday / gap / stale), and the
+  repo wired to a fake. M4 design spec committed.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 47/47 pass.
+
 ## 2026-06-01 — M3 T13+T14 Today + session engine + set logging [branch feat/calistrack-m3-t13-today-logging]
 - **Task:** the core loop — pick a program day, log sets, finish to a summary.
 - **Data:** `features/workout/data/workout_repository.dart` (save + recent +

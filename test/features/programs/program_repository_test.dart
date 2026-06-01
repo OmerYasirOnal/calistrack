@@ -66,18 +66,27 @@ void main() {
             final movement = byId[id];
             expect(movement, isNotNull, reason: 'unknown id "$id" in $pid');
 
-            // the supplied target must match how the movement is measured
+            // the supplied target must match how the movement is measured...
             final requiredKey = switch (movement!.type) {
               ExerciseType.reps || ExerciseType.weightedReps => 'targetReps',
               ExerciseType.hold => 'targetHoldSeconds',
               ExerciseType.distance => 'targetDistanceMeters',
               ExerciseType.time => 'targetDurationSeconds',
             };
+            // ...and be the ONLY target field, so targetSummary's precedence is
+            // unambiguous and no target is ever silently dropped.
+            const targetKeys = {
+              'targetReps',
+              'targetHoldSeconds',
+              'targetDistanceMeters',
+              'targetDurationSeconds',
+            };
+            final present = targetKeys.where(ex.containsKey).toSet();
             expect(
-              ex.containsKey(requiredKey),
-              isTrue,
-              reason:
-                  '"$id" (${movement.type.name}) needs $requiredKey in $pid',
+              present,
+              {requiredKey},
+              reason: '"$id" (${movement.type.name}) in $pid must carry only '
+                  '$requiredKey, found $present',
             );
           }
         }

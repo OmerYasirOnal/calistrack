@@ -125,9 +125,20 @@ class FakeUserRepository implements UserRepository {
   @override
   Future<void> setActiveProgram(String uid, String? programId) async {
     setActiveCalls++;
-    final current =
+    final base =
         store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
-    store[uid] = current.copyWith(activeProgramId: programId);
+    // Constructed explicitly (not copyWith) so a null programId truly *clears*
+    // the active program — mirroring the Firestore merge write.
+    store[uid] = AppUser(
+      uid: base.uid,
+      email: base.email,
+      displayName: base.displayName,
+      heightCm: base.heightCm,
+      weightKg: base.weightKg,
+      level: base.level,
+      goals: base.goals,
+      activeProgramId: programId,
+    );
     _emit(uid);
   }
 }

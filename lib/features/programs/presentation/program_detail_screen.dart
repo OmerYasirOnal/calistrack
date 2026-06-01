@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/program.dart';
 import '../../profile/application/profile_providers.dart';
@@ -106,9 +104,7 @@ class _ProgramDetail extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(Spacing.md),
           child: isActive
-              ? _ActiveFooter(
-                  onGoToday: () => context.go(Routes.today),
-                )
+              ? const _ActiveFooter()
               : FilledButton(
                   onPressed: saving
                       ? null
@@ -167,31 +163,22 @@ class _DaySection extends StatelessWidget {
 }
 
 class _ActiveFooter extends StatelessWidget {
-  const _ActiveFooter({required this.onGoToday});
-
-  final VoidCallback onGoToday;
+  const _ActiveFooter();
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.check_circle, color: scheme.primary),
-            const SizedBox(width: Spacing.sm),
-            Text(
-              'Your active program',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ],
+        Icon(Icons.check_circle, color: scheme.primary),
+        const SizedBox(width: Spacing.sm),
+        Text(
+          'Your active program',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        const SizedBox(height: Spacing.sm),
-        FilledButton(onPressed: onGoToday, child: const Text('Go to Today')),
       ],
     );
   }

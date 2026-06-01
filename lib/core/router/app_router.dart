@@ -23,6 +23,9 @@ abstract final class Routes {
   static const progress = '/progress';
   static const skills = '/skills';
   static const profile = '/profile';
+
+  /// Detail route for a single program, e.g. `/programs/classic_ppl`.
+  static String programDetail(String programId) => '$programs/$programId';
 }
 
 final _rootKey = GlobalKey<NavigatorState>();

@@ -34,7 +34,7 @@ class ProgramsScreen extends ConsumerWidget {
             return ProgramCard(
               program: program,
               isActive: program.id == activeId,
-              onTap: () => context.push('${Routes.programs}/${program.id}'),
+              onTap: () => context.push(Routes.programDetail(program.id)),
             );
           },
         ),

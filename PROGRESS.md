@@ -4,6 +4,23 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — 🎉 MVP CODE-COMPLETE (M1–M6 all merged to `main`)
+- **Milestones:** M1 Foundation · M2 Auth · M3 Programs & Workout · M4 Progress &
+  Skills · M5 AI generation (Cloud Function + fallback) · M6 Polish — all done,
+  issues #1–#6 closed, PRs #7–#19 merged (merge commits, history preserved).
+- **Quality bar:** CI green on `main` — format · analyze · 69 tests · **80.1%**
+  line coverage (75% gate). Every task went through a fresh adversarial review.
+- **Architecture:** feature-first (data/application/presentation), Riverpod,
+  go_router shell, repository pattern, all balance/preset data in `assets/data/*`
+  (no magic numbers), every async surface has loading/error/empty states.
+- **AI safety constraint honored:** OpenAI is called **only** server-side from the
+  `generateProgram` Cloud Function (auth-gated, key in a Firebase secret). The
+  client never holds an API key; it falls back to a local preset when undeployed.
+- **Owner-only steps remaining (cannot run from this session):**
+  `flutterfire configure` (real Firebase config) · deploy the function
+  (`firebase functions:secrets:set OPENAI_API_KEY` + `firebase deploy --only
+  functions`) · iOS/Android release builds + Apple/Play signing.
+
 ## 2026-06-02 — M6 T24 CI coverage gate [branch feat/calistrack-m6-t24-coverage]
 - **Task:** enforce test coverage in CI.
 - **Added:** CI `ci.yml` now runs `flutter test --coverage` + a **line-coverage

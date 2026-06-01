@@ -55,9 +55,17 @@ Each task links to its GitHub issue once created.
 | T20 | Client parse/persist + fallback | DONE | #5 | #16 |
 | T21 | AI generation UI | DONE | #5 | #17 |
 
-## M6 — Polish
+## M6 — Polish  ✅ (complete; issue #6 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T22 | Offline persistence (Firestore cache) | REVIEW | #6 | — |
-| T23 | a11y + empty/error polish | REVIEW | #6 | — |
-| T24 | Widget tests + coverage gate | REVIEW | #6 | — |
+| T22 | Offline persistence (Firestore cache) | DONE | #6 | #18 |
+| T23 | a11y + empty/error polish | DONE | #6 | #18 |
+| T24 | Widget tests + coverage gate | DONE | #6 | #19 |
+
+---
+
+**MVP code-complete (2026-06-01): M1–M6 all merged to `main`, CI green (80.1% line coverage, 75% gate).**
+Remaining owner-only steps (cannot be done from this session): `flutterfire configure`
+(real Firebase config), deploy the Cloud Function (`firebase functions:secrets:set
+OPENAI_API_KEY` + `firebase deploy --only functions`), and iOS/Android release builds
++ Apple/Play signing.

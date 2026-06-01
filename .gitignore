@@ -1,0 +1,27 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.pub-cache/
+.pub/
+pubspec.lock
+*.g.dart.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Firebase — real platform config is secret; a compile-safe placeholder
+# firebase_options.dart IS committed so CI can build (values are non-secret stubs).
+google-services.json
+GoogleService-Info.plist
+.firebase/
+functions/node_modules/
+functions/.env
+functions/lib/
+
+# OS
+.DS_Store

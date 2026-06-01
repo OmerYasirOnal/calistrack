@@ -1,0 +1,25 @@
+[
+  { "id": "push_up", "name": "Push-up", "muscleGroup": "push", "type": "reps", "description": "Horizontal push." },
+  { "id": "diamond_push_up", "name": "Diamond Push-up", "muscleGroup": "push", "type": "reps", "description": "Triceps-focused push-up." },
+  { "id": "dip", "name": "Dip", "muscleGroup": "push", "type": "weightedReps", "description": "Parallel-bar dip." },
+  { "id": "pike_push_up", "name": "Pike Push-up", "muscleGroup": "push", "type": "reps", "description": "Shoulder push." },
+  { "id": "pseudo_planche_push_up", "name": "Pseudo Planche Push-up", "muscleGroup": "push", "type": "reps", "description": "Leaned-forward push." },
+
+  { "id": "pull_up", "name": "Pull-up", "muscleGroup": "pull", "type": "weightedReps", "description": "Vertical pull, pronated." },
+  { "id": "chin_up", "name": "Chin-up", "muscleGroup": "pull", "type": "weightedReps", "description": "Vertical pull, supinated." },
+  { "id": "australian_row", "name": "Australian Row", "muscleGroup": "pull", "type": "reps", "description": "Horizontal bodyweight row." },
+  { "id": "scapular_pull", "name": "Scapular Pull", "muscleGroup": "pull", "type": "reps", "description": "Scapular retraction hang." },
+
+  { "id": "pistol_squat", "name": "Pistol Squat", "muscleGroup": "legs", "type": "reps", "description": "Single-leg squat." },
+  { "id": "bulgarian_split_squat", "name": "Bulgarian Split Squat", "muscleGroup": "legs", "type": "weightedReps", "description": "Rear-foot-elevated squat." },
+  { "id": "nordic_curl", "name": "Nordic Curl", "muscleGroup": "legs", "type": "reps", "description": "Hamstring eccentric." },
+  { "id": "calf_raise", "name": "Calf Raise", "muscleGroup": "legs", "type": "reps", "description": "Standing calf raise." },
+
+  { "id": "hanging_leg_raise", "name": "Hanging Leg Raise", "muscleGroup": "core", "type": "reps", "description": "Hanging core flexion." },
+  { "id": "plank", "name": "Plank", "muscleGroup": "core", "type": "hold", "description": "Front isometric hold." },
+  { "id": "hollow_hold", "name": "Hollow Hold", "muscleGroup": "core", "type": "hold", "description": "Hollow-body isometric." },
+  { "id": "l_sit", "name": "L-sit", "muscleGroup": "core", "type": "hold", "description": "Compression hold." },
+
+  { "id": "easy_run", "name": "Easy Run", "muscleGroup": "cardio", "type": "distance", "description": "Conversational-pace run." },
+  { "id": "intervals", "name": "Intervals", "muscleGroup": "cardio", "type": "time", "description": "Timed high-intensity intervals." }
+]

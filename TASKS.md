@@ -40,13 +40,13 @@ Each task links to its GitHub issue once created.
 | T13 | Today screen | DONE | #3 | #10 |
 | T14 | Set logging | DONE | #3 | #10 |
 
-## M4 — Progress & Skills
+## M4 — Progress & Skills  ✅ (complete; issue #4 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T15 | Progress repository | REVIEW | #4 | — |
-| T16 | Progress charts (fl_chart) | REVIEW | #4 | — |
-| T17 | Skill model + preset trees | REVIEW | #4 | — |
-| T18 | Skills screen | REVIEW | #4 | — |
+| T15 | Progress repository | DONE | #4 | #11 |
+| T16 | Progress charts (fl_chart) | DONE | #4 | #12 |
+| T17 | Skill model + preset trees | DONE | #4 | #13 |
+| T18 | Skills screen | DONE | #4 | #14 |
 
 ## M5 — AI generation
 | Task | Title | Status | Issue | PR |

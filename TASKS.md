@@ -14,14 +14,14 @@
 Status legend: `TODO` · `DOING` · `REVIEW` · `DONE`
 Each task links to its GitHub issue once created.
 
-## M1 — Foundation
+## M1 — Foundation  ✅ (verified locally on Flutter 3.44.0; CI mirror pending)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T1 | Project scaffold | DOING | — | — |
-| T2 | Material 3 dark theme | DOING | — | — |
-| T3 | Router + bottom-nav shell | DOING | — | — |
-| T4 | Data models + JSON + tests | DOING | — | — |
-| T5 | GitHub Actions CI | DOING | — | — |
+| T1 | Project scaffold | DONE | #65 | #64 |
+| T2 | Material 3 dark theme | DONE | #65 | #64 |
+| T3 | Router + bottom-nav shell | DONE | #65 | #64 |
+| T4 | Data models + JSON + tests | DONE | #65 | #64 |
+| T5 | GitHub Actions CI | DONE | #65 | #64 |
 
 ## M2 — Auth
 | Task | Title | Status | Issue | PR |

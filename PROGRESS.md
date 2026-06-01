@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — Local Flutter toolchain + verified-green M1
+- Installed **Flutter 3.44.0 stable** in the session container (network policy
+  allows storage.googleapis.com), ending blind CI iteration. All future
+  milestones are now verified locally (`dart format`, `flutter analyze`,
+  `flutter test`) before pushing.
+- Ran the real gates on the branch and fixed the last issues definitively:
+  - `flutter analyze` → removed `unnecessary_import` (foundation in main.dart)
+    and `unused_import` (material in app_smoke_test) → **No issues found**.
+  - `dart format` (3.44 "tall" style) reformatted `firebase_options.dart` and
+    `exercise.dart` → **clean**.
+  - `flutter test` → **8/8 passed**.
+- M1 is functionally complete pending the CI mirror going green.
+
 ## 2026-06-01 — M1 review + CI fix
 - **Review:** Fresh zero-context agent audited the M1 diff against the CI gates
   (`dart format`, `flutter analyze`, `flutter test`).

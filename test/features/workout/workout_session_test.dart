@@ -103,6 +103,29 @@ void main() {
     expect(workouts.saved, isEmpty);
   });
 
+  test('finish throws when signed out', () async {
+    final auth = FakeAuthRepository(); // no signed-in user
+    final workouts = FakeWorkoutRepository();
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(auth),
+        workoutRepositoryProvider.overrideWithValue(workouts),
+      ],
+    );
+    addTearDown(() {
+      auth.dispose();
+      container.dispose();
+    });
+    await container.read(authStateProvider.future); // resolves to null
+
+    final controller = container.read(workoutSessionProvider.notifier)
+      ..startDay(_program, _program.days.first);
+    controller.logSet('push_up', const LoggedSet(reps: 5));
+
+    await expectLater(controller.finish(), throwsStateError);
+    expect(workouts.saved, isEmpty);
+  });
+
   test('toWorkout omits movements with no logged sets', () {
     final session = WorkoutSession(
       program: _program,

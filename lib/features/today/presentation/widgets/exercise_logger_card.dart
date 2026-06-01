@@ -45,6 +45,23 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
   late int _meters = widget.exercise.targetDistanceMeters ?? 1000;
 
   bool _resting = false;
+  bool _seeded = false;
+
+  /// Pre-fill the inputs from last session's final set (once), so progressive
+  /// overload starts where you left off. Falls back to the program target.
+  void _seedFrom(LoggedSet last) {
+    switch (_mode) {
+      case LogMode.reps:
+        _reps = last.reps;
+        _weight = last.addedWeightKg;
+      case LogMode.hold:
+        if (last.holdSeconds != null) _seconds = last.holdSeconds!;
+      case LogMode.time:
+        if (last.durationSeconds != null) _seconds = last.durationSeconds!;
+      case LogMode.distance:
+        if (last.distanceMeters != null) _meters = last.distanceMeters!;
+    }
+  }
 
   void _log() {
     final set = switch (_mode) {
@@ -72,6 +89,12 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
             .watch(lastSetsForProvider(widget.exercise.exerciseId))
             .valueOrNull ??
         const [];
+
+    // Seed inputs from last session once it resolves (before any user edits).
+    if (!_seeded && lastSets.isNotEmpty) {
+      _seedFrom(lastSets.last);
+      _seeded = true;
+    }
 
     return Card(
       child: Padding(
@@ -313,7 +336,7 @@ class _RestTimerState extends State<_RestTimer> {
   String get _label {
     final m = _remaining ~/ 60;
     final s = _remaining % 60;
-    return '${m > 0 ? '$m:' : ''}${s.toString().padLeft(m > 0 ? 2 : 1, '0')}';
+    return m > 0 ? '$m:${s.toString().padLeft(2, '0')}' : '${s}s';
   }
 
   @override
@@ -323,7 +346,7 @@ class _RestTimerState extends State<_RestTimer> {
       children: [
         Icon(Icons.timer_outlined, color: scheme.primary, size: 20),
         const SizedBox(width: Spacing.sm),
-        Text('Rest ${_label}s', style: Theme.of(context).textTheme.titleSmall),
+        Text('Rest $_label', style: Theme.of(context).textTheme.titleSmall),
         const Spacer(),
         TextButton(onPressed: widget.onDone, child: const Text('Skip')),
       ],

@@ -75,7 +75,15 @@ class WorkoutSession {
 /// switches; it is cleared explicitly on finish/cancel.
 class WorkoutSessionController extends Notifier<WorkoutSession?> {
   @override
-  WorkoutSession? build() => null;
+  WorkoutSession? build() {
+    // Drop any in-progress session when the signed-in user changes (sign-out
+    // or a different account) so one user's sets can never be saved under
+    // another's uid.
+    ref.listen(authStateProvider, (previous, next) {
+      if (previous?.valueOrNull?.uid != next.valueOrNull?.uid) state = null;
+    });
+    return null;
+  }
 
   void startDay(Program program, ProgramDay day) {
     state = WorkoutSession(
@@ -131,9 +139,10 @@ final workoutSessionProvider =
 );
 
 /// The sets logged for [exerciseId] last time it was trained ("last time"
-/// reference + pre-fill). Empty when never logged or signed out.
-final lastSetsForProvider =
-    FutureProvider.family<List<LoggedSet>, String>((ref, exerciseId) async {
+/// reference + pre-fill). Empty when never logged or signed out. AutoDispose so
+/// it re-fetches fresh history for each new session (after a save).
+final lastSetsForProvider = FutureProvider.autoDispose
+    .family<List<LoggedSet>, String>((ref, exerciseId) async {
   final uid = ref.watch(authStateProvider).valueOrNull?.uid;
   if (uid == null) return const [];
   return ref.watch(workoutRepositoryProvider).lastSetsFor(uid, exerciseId);

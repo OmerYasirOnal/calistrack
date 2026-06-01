@@ -112,10 +112,12 @@ class _ActiveDayState extends ConsumerState<_ActiveDay> {
     final trainingDays =
         widget.program.days.where((d) => !d.isRest).toList(growable: false);
 
-    int restFor(exerciseId) {
+    int restFor(String exerciseId) {
+      if (defaults == null) return 0; // still loading → no rest prompt yet
       final type = typeById[exerciseId];
-      if (defaults == null || type == null) return 90;
-      return defaults.restSecondsFor(type);
+      return type == null
+          ? defaults.defaultRestSeconds
+          : defaults.restSecondsFor(type);
     }
 
     return Column(

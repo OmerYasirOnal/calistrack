@@ -1,0 +1,10 @@
+{
+  "restSecondsByType": {
+    "reps": 90,
+    "weightedReps": 120,
+    "hold": 60,
+    "distance": 0,
+    "time": 60
+  },
+  "defaultRestSeconds": 90
+}

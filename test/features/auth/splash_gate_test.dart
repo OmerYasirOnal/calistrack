@@ -32,10 +32,10 @@ void main() {
     // First frame while auth is still loading: splash, not Today.
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text("Today's workout will appear here."), findsNothing);
+    expect(find.text('No active program yet'), findsNothing);
 
-    // After auth resolves, the gated router lands on Today.
+    // After auth resolves, the gated router lands on Today (empty state here).
     await tester.pumpAndSettle();
-    expect(find.text("Today's workout will appear here."), findsOneWidget);
+    expect(find.text('No active program yet'), findsOneWidget);
   });
 }

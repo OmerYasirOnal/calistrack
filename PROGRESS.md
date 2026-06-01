@@ -4,6 +4,18 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M4 T17 Skill trees + SkillRepository [branch feat/calistrack-m4-t17-skills-repo]
+- **Task:** preset skill progressions + a repo that merges them with saved progress.
+- **Added:** `assets/data/skills.json` — 5 trees (Muscle-up / Front Lever /
+  Planche / Handstand / Pistol Squat), each step with exactly one target
+  (reps or hold). `features/skills/data/skill_repository.dart` — `SkillRepository`
+  (presets from assets, `watch(uid)` merging saved `users/{uid}/skills` progress,
+  `logAttempt` via arrayUnion, `setStep`), pure `mergeSkills()` overlay,
+  `skillRepositoryProvider` + `userSkillsProvider`. `FakeSkillRepository` added.
+- **Tests:** preset parse + integrity (5 skills, unique step ids, exactly-one-
+  target per step, start at step 0), `mergeSkills` overlay.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 56/56 pass.
+
 ## 2026-06-02 — M4 T16 Progress screen + fl_chart [branch feat/calistrack-m4-t16-progress-screen]
 - **Task:** turn aggregated history into a visual Progress tab.
 - **Added:** `features/progress/presentation/progress_screen.dart` — overall

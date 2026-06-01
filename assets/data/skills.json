@@ -1,0 +1,59 @@
+[
+  {
+    "id": "muscle_up",
+    "name": "Muscle-up",
+    "description": "From a dead hang to support above the bar.",
+    "steps": [
+      { "id": "false_grip_hang", "name": "False-grip hang", "description": "Hang with a false grip.", "targetHoldSeconds": 20 },
+      { "id": "high_pull_up", "name": "High pull-up", "description": "Pull the bar to your sternum.", "targetReps": 5 },
+      { "id": "explosive_pull_up", "name": "Explosive pull-up", "description": "Pull to lower-chest with control.", "targetReps": 5 },
+      { "id": "negative_muscle_up", "name": "Negative muscle-up", "description": "Lower slowly from support.", "targetReps": 3 },
+      { "id": "muscle_up", "name": "Muscle-up", "description": "Full clean rep.", "targetReps": 1 }
+    ]
+  },
+  {
+    "id": "front_lever",
+    "name": "Front Lever",
+    "description": "A horizontal body hold facing up under the bar.",
+    "steps": [
+      { "id": "tuck_fl", "name": "Tuck front lever", "description": "Knees tucked, back parallel.", "targetHoldSeconds": 15 },
+      { "id": "adv_tuck_fl", "name": "Advanced tuck", "description": "Open the hips, flatten the back.", "targetHoldSeconds": 15 },
+      { "id": "straddle_fl", "name": "Straddle front lever", "description": "Legs wide and straight.", "targetHoldSeconds": 10 },
+      { "id": "full_fl", "name": "Full front lever", "description": "Body straight and horizontal.", "targetHoldSeconds": 5 }
+    ]
+  },
+  {
+    "id": "planche",
+    "name": "Planche",
+    "description": "A horizontal hold above the hands, facing down.",
+    "steps": [
+      { "id": "planche_lean", "name": "Planche lean", "description": "Lean shoulders past the wrists.", "targetHoldSeconds": 20 },
+      { "id": "tuck_planche", "name": "Tuck planche", "description": "Knees tucked, hips over hands.", "targetHoldSeconds": 15 },
+      { "id": "adv_tuck_planche", "name": "Advanced tuck planche", "description": "Open the hips, flat back.", "targetHoldSeconds": 12 },
+      { "id": "straddle_planche", "name": "Straddle planche", "description": "Legs wide and straight.", "targetHoldSeconds": 8 },
+      { "id": "full_planche", "name": "Full planche", "description": "Body straight and horizontal.", "targetHoldSeconds": 5 }
+    ]
+  },
+  {
+    "id": "handstand",
+    "name": "Handstand",
+    "description": "A balanced inverted hold on the hands.",
+    "steps": [
+      { "id": "wall_plank", "name": "Wall plank", "description": "Feet on the wall, shoulders stacked.", "targetHoldSeconds": 40 },
+      { "id": "wall_handstand", "name": "Wall handstand", "description": "Chest-to-wall hold.", "targetHoldSeconds": 40 },
+      { "id": "kick_up", "name": "Kick-up practice", "description": "Freestanding kick-up attempts.", "targetReps": 10 },
+      { "id": "freestanding_handstand", "name": "Freestanding handstand", "description": "Balanced hold, no wall.", "targetHoldSeconds": 10 }
+    ]
+  },
+  {
+    "id": "pistol_squat",
+    "name": "Pistol Squat",
+    "description": "A full single-leg squat.",
+    "steps": [
+      { "id": "assisted_pistol", "name": "Assisted pistol", "description": "Hold a support for balance.", "targetReps": 8 },
+      { "id": "box_pistol", "name": "Box pistol", "description": "Sit to a box and stand on one leg.", "targetReps": 6 },
+      { "id": "negative_pistol", "name": "Negative pistol", "description": "Lower slowly on one leg.", "targetReps": 5 },
+      { "id": "full_pistol", "name": "Full pistol squat", "description": "Full depth, no assistance.", "targetReps": 3 }
+    ]
+  }
+]

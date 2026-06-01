@@ -7,6 +7,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/programs/presentation/program_detail_screen.dart';
 import '../../features/programs/presentation/programs_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
 import '../../features/skills/presentation/skills_screen.dart';
@@ -84,6 +85,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.programs,
                 builder: (context, state) => const ProgramsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':programId',
+                    builder: (context, state) => ProgramDetailScreen(
+                      programId: state.pathParameters['programId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

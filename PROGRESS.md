@@ -4,6 +4,23 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M3 T12 Programs screen [branch feat/calistrack-m3-t12-programs-screen]
+- **Task:** browse presets, open a program's day/movement breakdown, set it active.
+- **Added:** `programs/presentation/programs_screen.dart` (real list, replaces
+  placeholder), `program_detail_screen.dart` (days + targets + set-active +
+  active footer), `widgets/program_card.dart`, `program_format.dart`
+  (`targetSummary` — reps/hold/distance/duration). State:
+  `profile/application/profile_providers.dart` (`currentUserProfileProvider`),
+  `programs/application/program_providers.dart` (`activeProgramProvider`,
+  `ActiveProgramController.setActive`). `UserRepository.setActiveProgram` (merge
+  write) + fake updated to a live broadcast stream. Router: nested
+  `/programs/:programId` detail route.
+- **Tests:** new widget test pumps the app → Programs → detail → Set as active →
+  asserts persistence + active footer. Smoke test updated for the real screen.
+- **Note:** in-app screens are auth-gated; live screenshots await Firebase config
+  or a preview mode (planned for T13/T14).
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 27/27 pass.
+
 ## 2026-06-01 — M3 T11 Programs repo + presets [branch feat/calistrack-m3-t11-programs-repo]
 - **Task:** preset programs + ProgramRepository, plus a backward-compatible
   cardio model extension so a Run day logs end-to-end.

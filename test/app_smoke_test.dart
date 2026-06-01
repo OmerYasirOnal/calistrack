@@ -39,12 +39,9 @@ void main() {
       expect(find.text(label), findsWidgets);
     }
 
-    // Tapping Programs navigates.
+    // Tapping Programs navigates to the real program list (preset loaded).
     await tester.tap(find.text('Programs'));
     await tester.pumpAndSettle();
-    expect(
-      find.text('Preset and AI-generated programs will appear here.'),
-      findsOneWidget,
-    );
+    expect(find.text('Classic PPL'), findsOneWidget);
   });
 }

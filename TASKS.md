@@ -60,4 +60,4 @@ Each task links to its GitHub issue once created.
 |------|-------|--------|-------|----|
 | T22 | Offline persistence (Firestore cache) | REVIEW | #6 | — |
 | T23 | a11y + empty/error polish | REVIEW | #6 | — |
-| T24 | Widget tests + coverage gate | TODO | — | — |
+| T24 | Widget tests + coverage gate | REVIEW | #6 | — |

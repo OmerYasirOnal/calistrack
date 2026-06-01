@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
+import 'package:calistrack/features/programs/data/user_program_repository.dart';
 import 'package:calistrack/features/skills/data/skill_repository.dart';
 import 'package:calistrack/features/workout/data/workout_repository.dart';
 import 'package:calistrack/models/app_user.dart';
+import 'package:calistrack/models/program.dart';
 import 'package:calistrack/models/skill_progress.dart';
 import 'package:calistrack/models/workout.dart';
 import 'package:collection/collection.dart';
@@ -216,5 +218,28 @@ class FakeSkillRepository implements SkillRepository {
     final cur = saved[skillId] ?? (currentStepIndex: 0, logs: <SkillLog>[]);
     saved[skillId] = (currentStepIndex: currentStepIndex, logs: cur.logs);
     _emit();
+  }
+}
+
+/// In-memory [UserProgramRepository] for tests — records saves and emits live.
+class FakeUserProgramRepository implements UserProgramRepository {
+  final List<Program> saved = [];
+  final StreamController<List<Program>> _controller =
+      StreamController<List<Program>>.broadcast();
+
+  void dispose() => _controller.close();
+
+  @override
+  Future<void> saveProgram(String uid, Program program) async {
+    saved
+      ..removeWhere((p) => p.id == program.id)
+      ..add(program);
+    _controller.add([...saved]);
+  }
+
+  @override
+  Stream<List<Program>> watch(String uid) async* {
+    yield [...saved];
+    yield* _controller.stream;
   }
 }

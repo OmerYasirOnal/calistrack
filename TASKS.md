@@ -52,7 +52,7 @@ Each task links to its GitHub issue once created.
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
 | T19 | generateProgram Cloud Function | REVIEW | #5 | — |
-| T20 | Client parse/persist + fallback | TODO | — | — |
+| T20 | Client parse/persist + fallback | REVIEW | #5 | — |
 | T21 | AI generation UI | TODO | — | — |
 
 ## M6 — Polish

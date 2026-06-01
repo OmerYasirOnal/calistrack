@@ -7,9 +7,13 @@ import 'package:calistrack/models/app_user.dart';
 /// In-memory [AuthRepository] for tests. Emits an initial user (or null) and
 /// records calls so behaviour can be asserted without Firebase.
 class FakeAuthRepository implements AuthRepository {
-  FakeAuthRepository({AppUser? initialUser}) : _current = initialUser;
+  FakeAuthRepository({AppUser? initialUser, this.initialDelay = Duration.zero})
+      : _current = initialUser;
 
   AppUser? _current;
+
+  /// Simulates the real async gap before Firebase restores the auth state.
+  final Duration initialDelay;
   final StreamController<AppUser?> _controller =
       StreamController<AppUser?>.broadcast();
 
@@ -29,6 +33,7 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Stream<AppUser?> authStateChanges() async* {
+    if (initialDelay > Duration.zero) await Future<void>.delayed(initialDelay);
     yield _current;
     yield* _controller.stream;
   }

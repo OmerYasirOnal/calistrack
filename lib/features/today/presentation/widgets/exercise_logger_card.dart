@@ -258,6 +258,7 @@ class _Stepper extends StatelessWidget {
           onPressed: onMinus,
           icon: const Icon(Icons.remove_circle_outline),
           visualDensity: VisualDensity.compact,
+          tooltip: 'Decrease $label',
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
@@ -273,6 +274,7 @@ class _Stepper extends StatelessWidget {
           onPressed: onPlus,
           icon: const Icon(Icons.add_circle_outline),
           visualDensity: VisualDensity.compact,
+          tooltip: 'Increase $label',
         ),
       ],
     );

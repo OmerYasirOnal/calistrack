@@ -219,6 +219,7 @@ class _StepLoggerState extends State<_StepLogger> {
                     () => _value = (_value - increment).clamp(1, 9999),
                   ),
                   icon: const Icon(Icons.remove_circle_outline),
+                  tooltip: 'Decrease ${_isHold ? 'seconds' : 'reps'}',
                 ),
                 Text(
                   _isHold ? '$_value s' : '$_value reps',
@@ -231,6 +232,7 @@ class _StepLoggerState extends State<_StepLogger> {
                     () => _value = (_value + increment).clamp(1, 9999),
                   ),
                   icon: const Icon(Icons.add_circle_outline),
+                  tooltip: 'Increase ${_isHold ? 'seconds' : 'reps'}',
                 ),
               ],
             ),

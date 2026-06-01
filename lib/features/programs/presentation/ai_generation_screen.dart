@@ -107,11 +107,13 @@ class _AiGenerationScreenState extends ConsumerState<AiGenerationScreen> {
             IconButton(
               onPressed: () => setState(() => _days = (_days - 1).clamp(1, 7)),
               icon: const Icon(Icons.remove_circle_outline),
+              tooltip: 'Fewer days',
             ),
             Text('$_days', style: text.titleLarge),
             IconButton(
               onPressed: () => setState(() => _days = (_days + 1).clamp(1, 7)),
               icon: const Icon(Icons.add_circle_outline),
+              tooltip: 'More days',
             ),
           ],
         ),

@@ -4,6 +4,17 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M6 T22+T23 Offline persistence + a11y polish [branch feat/calistrack-m6-t22-offline]
+- **T22 Offline:** enable Firestore persistence explicitly in `main.dart`
+  (`Settings(persistenceEnabled: true, cacheSizeBytes: CACHE_SIZE_UNLIMITED)`),
+  set after `initializeApp` (only when Firebase is wired). Offline-first via the
+  built-in cache; a Hive mirror would be redundant for Firestore data — decision
+  documented in the M6 spec.
+- **T23 a11y:** tooltips/semantics on the icon-only steppers (logger reps/kg/sec,
+  skill +/-, AI days). States audited — every async surface already has
+  loading/error/empty.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 69/69 pass.
+
 ## 2026-06-02 — M5 T21 AI generation screen + user programs [branch feat/calistrack-m5-t21-ai-screen]
 - **Task:** the AI UI — form → generate → preview → save — and surface user
   programs in the Programs tab.

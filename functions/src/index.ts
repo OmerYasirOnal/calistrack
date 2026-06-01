@@ -31,39 +31,48 @@ function systemPrompt(): string {
   ].join(" ");
 }
 
-interface ProgramExercise {
-  exerciseId: string;
-  targetSets: number;
-  targetReps?: number;
-  targetHoldSeconds?: number;
-  targetDistanceMeters?: number;
-  targetDurationSeconds?: number;
+/** Coerce a positive integer, or undefined. */
+function posInt(v: unknown): number | undefined {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? Math.round(n) : undefined;
 }
 
-/** Keep only movements with a known id and at least one valid target. */
+/**
+ * Keep only movements with a known id and EXACTLY ONE valid numeric target.
+ * Exercises carry `exerciseId` + targets only (no `name`) — the client resolves
+ * display names from the bundled exercise library, the single source of truth,
+ * exactly like `assets/data/programs.json`.
+ */
 function sanitize(program: any): any {
   const days = Array.isArray(program?.days) ? program.days : [];
   const cleanDays = days
     .map((d: any) => ({
       label: String(d?.label ?? "Day"),
       exercises: (Array.isArray(d?.exercises) ? d.exercises : [])
-        .filter((e: ProgramExercise) => EXERCISE_IDS.includes(e?.exerciseId))
-        .map((e: ProgramExercise) => ({
-          exerciseId: e.exerciseId,
-          targetSets: Math.max(1, Math.round(e.targetSets ?? 3)),
-          ...(e.targetReps != null ? {targetReps: e.targetReps} : {}),
-          ...(e.targetHoldSeconds != null ?
-            {targetHoldSeconds: e.targetHoldSeconds} : {}),
-          ...(e.targetDistanceMeters != null ?
-            {targetDistanceMeters: e.targetDistanceMeters} : {}),
-          ...(e.targetDurationSeconds != null ?
-            {targetDurationSeconds: e.targetDurationSeconds} : {}),
-        })),
+        .filter((e: any) => EXERCISE_IDS.includes(e?.exerciseId))
+        .map((e: any) => {
+          const reps = posInt(e.targetReps);
+          const hold = posInt(e.targetHoldSeconds);
+          const dist = posInt(e.targetDistanceMeters);
+          const dur = posInt(e.targetDurationSeconds);
+          const present =
+            [reps, hold, dist, dur].filter((x) => x !== undefined);
+          if (present.length !== 1) return null; // exactly one target required
+          return {
+            exerciseId: e.exerciseId as string,
+            targetSets: posInt(e.targetSets) ?? 3,
+            ...(reps !== undefined ? {targetReps: reps} : {}),
+            ...(hold !== undefined ? {targetHoldSeconds: hold} : {}),
+            ...(dist !== undefined ? {targetDistanceMeters: dist} : {}),
+            ...(dur !== undefined ? {targetDurationSeconds: dur} : {}),
+          };
+        })
+        .filter((e: any) => e !== null),
     }))
     .filter((d: any) => d.exercises.length > 0);
 
   if (cleanDays.length === 0) {
-    throw new HttpsError("internal", "Model returned no usable days.");
+    throw new HttpsError("internal", "Model returned no usable movements.");
   }
   return {
     name: String(program?.name ?? "AI Program"),
@@ -75,6 +84,13 @@ function sanitize(program: any): any {
 export const generateProgram = onCall(
   {secrets: [openaiKey]},
   async (request) => {
+    // Authenticated callers only — this hits the paid OpenAI API, so an open
+    // callable would be a cost-abuse vector. (Also enable App Check + per-user
+    // rate limiting before a public launch.)
+    if (request.auth == null) {
+      throw new HttpsError("unauthenticated", "Sign in to generate a program.");
+    }
+
     const {level, goals, daysPerWeek, equipment} = request.data ?? {};
     if (typeof daysPerWeek !== "number" || daysPerWeek < 1 || daysPerWeek > 7) {
       throw new HttpsError("invalid-argument", "daysPerWeek must be 1..7.");
@@ -97,6 +113,7 @@ export const generateProgram = onCall(
         },
         body: JSON.stringify({
           model: MODEL,
+          max_tokens: 1200, // cap cost + avoid truncated JSON
           response_format: {type: "json_object"},
           messages: [
             {role: "system", content: systemPrompt()},
@@ -105,7 +122,10 @@ export const generateProgram = onCall(
         }),
       });
     } catch (e) {
-      logger.error("OpenAI request threw", e);
+      // Log the message only — never the request (which carries the bearer key).
+      logger.error("OpenAI request threw", {
+        message: e instanceof Error ? e.message : String(e),
+      });
       throw new HttpsError("unavailable", "Generation service unavailable.");
     }
 
@@ -119,6 +139,12 @@ export const generateProgram = onCall(
     if (typeof content !== "string") {
       throw new HttpsError("internal", "Empty model response.");
     }
-    return sanitize(JSON.parse(content));
+    try {
+      return sanitize(JSON.parse(content));
+    } catch (e) {
+      if (e instanceof HttpsError) throw e; // keep mapped errors (e.g. no days)
+      logger.error("Failed to parse/sanitize model output");
+      throw new HttpsError("internal", "Model returned a malformed program.");
+    }
   },
 );

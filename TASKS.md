@@ -51,7 +51,7 @@ Each task links to its GitHub issue once created.
 ## M5 — AI generation
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T19 | generateProgram Cloud Function | TODO | — | — |
+| T19 | generateProgram Cloud Function | REVIEW | #5 | — |
 | T20 | Client parse/persist + fallback | TODO | — | — |
 | T21 | AI generation UI | TODO | — | — |
 

@@ -18,7 +18,7 @@ void main() {
           .toList();
     });
 
-    test('parses the expected skill trees', () {
+    test('parses the expected skill trees with descriptions', () {
       expect(skills, hasLength(5));
       expect(
         skills.map((s) => s.id),
@@ -30,6 +30,7 @@ void main() {
           'pistol_squat',
         ]),
       );
+      expect(skills.every((s) => s.description.isNotEmpty), isTrue);
     });
 
     test('every step is well-formed with exactly one target', () {
@@ -50,8 +51,22 @@ void main() {
             isTrue,
             reason: '${skill.id}/${step.id} must have exactly one target',
           );
+          final target = step.targetReps ?? step.targetHoldSeconds!;
+          expect(target, greaterThan(0), reason: '${skill.id}/${step.id}');
         }
       }
+    });
+
+    test('completed skill (index == steps.length) → ratio 1, no current step',
+        () {
+      const skill = SkillProgress(
+        id: 'x',
+        name: 'X',
+        steps: [SkillStep(id: 'a', name: 'A'), SkillStep(id: 'b', name: 'B')],
+        currentStepIndex: 2,
+      );
+      expect(skill.completionRatio, 1.0);
+      expect(skill.currentStep, isNull);
     });
 
     test('presets start at step 0 with no logs', () {

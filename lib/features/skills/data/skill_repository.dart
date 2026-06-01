@@ -12,7 +12,8 @@ import '../../auth/data/auth_repository.dart';
 typedef SavedSkill = ({int currentStepIndex, List<SkillLog> logs});
 
 /// Overlays saved per-skill progress (current step + logs) onto the preset
-/// trees. Pure — unit-tested directly.
+/// trees. Saved entries with no matching preset are intentionally dropped (a
+/// removed/renamed preset shouldn't surface stale progress). Pure.
 List<SkillProgress> mergeSkills(
   List<SkillProgress> presets,
   Map<String, SavedSkill> saved,
@@ -89,13 +90,19 @@ class FirestoreSkillRepository implements SkillRepository {
   }
 
   @override
-  Future<void> logAttempt(String uid, String skillId, SkillLog log) =>
-      _col(uid).doc(skillId).set(
-        {
-          'logs': FieldValue.arrayUnion([log.toJson()]),
-        },
-        SetOptions(merge: true),
-      );
+  Future<void> logAttempt(String uid, String skillId, SkillLog log) {
+    // A transaction (read-append-write), NOT arrayUnion — arrayUnion has set
+    // semantics and would silently drop a repeated identical attempt.
+    final doc = _col(uid).doc(skillId);
+    return _db.runTransaction((tx) async {
+      final snap = await tx.get(doc);
+      final logs = [
+        ...?(snap.data()?['logs'] as List<dynamic>?),
+        log.toJson(),
+      ];
+      tx.set(doc, {'logs': logs}, SetOptions(merge: true));
+    });
+  }
 
   @override
   Future<void> setStep(String uid, String skillId, int currentStepIndex) =>

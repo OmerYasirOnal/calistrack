@@ -4,6 +4,8 @@ class LoggedSet {
     required this.reps,
     this.addedWeightKg = 0,
     this.holdSeconds,
+    this.distanceMeters,
+    this.durationSeconds,
   });
 
   final int reps;
@@ -12,28 +14,47 @@ class LoggedSet {
   /// For isometric/hold exercises; null otherwise.
   final int? holdSeconds;
 
+  /// For distance cardio (e.g. a run), in metres; null otherwise.
+  final int? distanceMeters;
+
+  /// For timed efforts/intervals, in seconds; null otherwise.
+  final int? durationSeconds;
+
   /// Training volume contribution: reps × (bodyweight-relative + added weight).
   /// We approximate volume as reps × max(addedWeight, 1) so bodyweight sets
-  /// still register. Real bodyweight factoring happens in the progress layer.
+  /// still register. Cardio (distance/duration) is surfaced separately in the
+  /// progress layer, not folded into strength volume.
   double get volume => reps * (addedWeightKg <= 0 ? 1 : addedWeightKg);
 
   factory LoggedSet.fromJson(Map<String, dynamic> json) => LoggedSet(
         reps: (json['reps'] as num?)?.toInt() ?? 0,
         addedWeightKg: (json['addedWeightKg'] as num?)?.toDouble() ?? 0,
         holdSeconds: (json['holdSeconds'] as num?)?.toInt(),
+        distanceMeters: (json['distanceMeters'] as num?)?.toInt(),
+        durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
       );
 
   Map<String, dynamic> toJson() => {
         'reps': reps,
         'addedWeightKg': addedWeightKg,
         if (holdSeconds != null) 'holdSeconds': holdSeconds,
+        if (distanceMeters != null) 'distanceMeters': distanceMeters,
+        if (durationSeconds != null) 'durationSeconds': durationSeconds,
       };
 
-  LoggedSet copyWith({int? reps, double? addedWeightKg, int? holdSeconds}) =>
+  LoggedSet copyWith({
+    int? reps,
+    double? addedWeightKg,
+    int? holdSeconds,
+    int? distanceMeters,
+    int? durationSeconds,
+  }) =>
       LoggedSet(
         reps: reps ?? this.reps,
         addedWeightKg: addedWeightKg ?? this.addedWeightKg,
         holdSeconds: holdSeconds ?? this.holdSeconds,
+        distanceMeters: distanceMeters ?? this.distanceMeters,
+        durationSeconds: durationSeconds ?? this.durationSeconds,
       );
 }
 

@@ -4,6 +4,22 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M3 T11 Programs repo + presets [branch feat/calistrack-m3-t11-programs-repo]
+- **Task:** preset programs + ProgramRepository, plus a backward-compatible
+  cardio model extension so a Run day logs end-to-end.
+- **Models:** `LoggedSet` += `distanceMeters?` / `durationSeconds?`;
+  `ProgramExercise` += `targetDistanceMeters?` / `targetDurationSeconds?` (all
+  nullable + conditional JSON → legacy docs still parse).
+- **Added:** `assets/data/programs.json` — 4 presets (Classic PPL · PPL + Core ·
+  Foundations · Hybrid w/ a Run day), storing ids + targets only with names
+  resolved from the library. `features/programs/data/program_repository.dart`
+  (`presets(library)` resolves names, throws on unknown ids) with
+  `programRepositoryProvider` + `presetProgramsProvider`.
+- **Tests:** model round-trip + legacy-parse for the new fields; ProgramRepository
+  preset parse, **preset-integrity** (every exerciseId resolves in the library),
+  cardio-target presence, and a `StateError` on an unknown id.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 26/26 pass.
+
 ## 2026-06-01 — M3 T10 Exercise library repo [branch feat/calistrack-m3-t10-exercise-repo]
 - **Task:** ExerciseRepository — load the bundled movement library from assets.
 - **Added:** `features/exercises/data/exercise_repository.dart` (injectable

@@ -60,6 +60,33 @@ void main() {
       expect(decoded.days.first.exercises.first.targetReps, 10);
       expect(decoded.source, ProgramSource.preset);
     });
+
+    test('ProgramExercise round-trips cardio targets, omitting null ones', () {
+      const run = ProgramExercise(
+        exerciseId: 'easy_run',
+        name: 'Easy Run',
+        targetSets: 1,
+        targetDistanceMeters: 5000,
+        targetDurationSeconds: 1500,
+      );
+      final json = run.toJson();
+      expect(json.containsKey('targetReps'), false);
+      final decoded = ProgramExercise.fromJson(json);
+      expect(decoded.targetDistanceMeters, 5000);
+      expect(decoded.targetDurationSeconds, 1500);
+      expect(decoded.targetReps, isNull);
+    });
+
+    test('ProgramExercise parses legacy JSON without cardio fields', () {
+      final decoded = ProgramExercise.fromJson({
+        'exerciseId': 'dip',
+        'name': 'Dip',
+        'targetSets': 3,
+        'targetReps': 8,
+      });
+      expect(decoded.targetDistanceMeters, isNull);
+      expect(decoded.targetDurationSeconds, isNull);
+    });
   });
 
   group('Workout', () {
@@ -91,6 +118,20 @@ void main() {
     test('bodyweight set still contributes volume', () {
       const set = LoggedSet(reps: 12);
       expect(set.volume, 12);
+    });
+
+    test('LoggedSet round-trips cardio fields and stays back-compatible', () {
+      const run =
+          LoggedSet(reps: 1, distanceMeters: 5000, durationSeconds: 1500);
+      final decoded = LoggedSet.fromJson(run.toJson());
+      expect(decoded.distanceMeters, 5000);
+      expect(decoded.durationSeconds, 1500);
+
+      // a legacy set written before the cardio fields existed still parses
+      final legacy = LoggedSet.fromJson({'reps': 10, 'addedWeightKg': 20.0});
+      expect(legacy.distanceMeters, isNull);
+      expect(legacy.durationSeconds, isNull);
+      expect(legacy.reps, 10);
     });
   });
 

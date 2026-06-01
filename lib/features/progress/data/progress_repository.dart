@@ -19,6 +19,7 @@ class ExerciseDataPoint {
     required this.topWeight,
     required this.bestHoldSeconds,
     required this.totalDistanceMeters,
+    required this.totalDurationSeconds,
   });
 
   final DateTime date;
@@ -27,6 +28,7 @@ class ExerciseDataPoint {
   final double topWeight;
   final int bestHoldSeconds;
   final int totalDistanceMeters;
+  final int totalDurationSeconds;
 }
 
 /// Headline training stats across all workouts.
@@ -73,6 +75,8 @@ List<ExerciseDataPoint> exerciseHistory(
         ),
         totalDistanceMeters:
             logged.sets.fold(0, (sum, s) => sum + (s.distanceMeters ?? 0)),
+        totalDurationSeconds:
+            logged.sets.fold(0, (sum, s) => sum + (s.durationSeconds ?? 0)),
       ),
     );
   }

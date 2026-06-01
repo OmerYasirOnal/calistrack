@@ -19,10 +19,12 @@ import 'app.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/profile/data/user_repository.dart';
 import 'features/programs/application/program_providers.dart';
+import 'features/programs/data/user_program_repository.dart';
 import 'features/skills/data/skill_repository.dart';
 import 'features/workout/application/workout_session.dart';
 import 'features/workout/data/workout_repository.dart';
 import 'models/app_user.dart';
+import 'models/program.dart';
 import 'models/skill_progress.dart';
 import 'models/workout.dart';
 
@@ -178,6 +180,26 @@ class _PreviewSkills implements SkillRepository {
   }
 }
 
+class _PreviewUserPrograms implements UserProgramRepository {
+  final List<Program> _saved = [];
+  final StreamController<List<Program>> _controller =
+      StreamController<List<Program>>.broadcast();
+
+  @override
+  Future<void> saveProgram(String uid, Program program) async {
+    _saved
+      ..removeWhere((p) => p.id == program.id)
+      ..add(program);
+    _controller.add([..._saved]);
+  }
+
+  @override
+  Stream<List<Program>> watch(String uid) async* {
+    yield [..._saved];
+    yield* _controller.stream;
+  }
+}
+
 class _PreviewWorkouts implements WorkoutRepository {
   final List<Workout> _saved = [..._seedHistory];
 
@@ -209,6 +231,7 @@ void main() {
       userRepositoryProvider.overrideWithValue(_PreviewUsers()),
       workoutRepositoryProvider.overrideWithValue(_PreviewWorkouts()),
       skillRepositoryProvider.overrideWithValue(_PreviewSkills()),
+      userProgramRepositoryProvider.overrideWithValue(_PreviewUserPrograms()),
     ],
   );
   runApp(

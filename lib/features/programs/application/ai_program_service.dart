@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/app_user.dart';
 import '../../../models/exercise.dart';
 import '../../../models/program.dart';
+import '../../auth/data/auth_repository.dart';
+import '../../exercises/data/exercise_repository.dart';
+import '../../profile/data/user_repository.dart';
+import '../data/program_repository.dart';
+import '../data/user_program_repository.dart';
 
 /// The inputs for AI program generation.
 class GenerationRequest {
@@ -149,3 +156,35 @@ Future<Map<String, dynamic>> _callFunction(
 
 final aiProgramServiceProvider =
     Provider<AiProgramService>((ref) => AiProgramService());
+
+/// Drives the generate → preview → save flow. State holds the previewed
+/// [GenerationResult] (null before the first generation).
+class AiGenerationController
+    extends AutoDisposeAsyncNotifier<GenerationResult?> {
+  @override
+  FutureOr<GenerationResult?> build() => null;
+
+  Future<void> generate(GenerationRequest request) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final library = await ref.read(exerciseLibraryProvider.future);
+      final presets = await ref.read(presetProgramsProvider.future);
+      return ref
+          .read(aiProgramServiceProvider)
+          .generate(request, library: library, presets: presets);
+    });
+  }
+
+  /// Persists [program] to the user's collection and makes it active.
+  Future<void> save(Program program) async {
+    final uid = (await ref.read(authStateProvider.future))?.uid;
+    if (uid == null) throw StateError('Cannot save while signed out.');
+    await ref.read(userProgramRepositoryProvider).saveProgram(uid, program);
+    await ref.read(userRepositoryProvider).setActiveProgram(uid, program.id);
+  }
+}
+
+final aiGenerationControllerProvider =
+    AutoDisposeAsyncNotifierProvider<AiGenerationController, GenerationResult?>(
+  AiGenerationController.new,
+);

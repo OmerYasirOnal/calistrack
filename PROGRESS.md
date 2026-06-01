@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M5 T21 AI generation screen + user programs [branch feat/calistrack-m5-t21-ai-screen]
+- **Task:** the AI UI — form → generate → preview → save — and surface user
+  programs in the Programs tab.
+- **Added:** `programs/presentation/ai_generation_screen.dart` (level/days/goals/
+  equipment form → Generate → preview w/ fallback banner → Save & set active),
+  `AiGenerationController` (generate/save). Programs screen now has a "Generate"
+  FAB (pushes the AI screen) + a "Your programs" section (userProgramsProvider).
+  Preview extended with an in-memory user-program repo so save works without
+  Firebase.
+- **Tests:** AI form → generate (fake service) → preview → save persists +
+  sets active. `save` now awaits auth (robust to an unresolved auth snapshot).
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 67/67 pass.
+
 ## 2026-06-02 — M5 T20 AI client service + persist + fallback [branch feat/calistrack-m5-t20-ai-client]
 - **Task:** the client side of AI generation — call the function, parse, persist,
   and a fallback so it works without deploy.

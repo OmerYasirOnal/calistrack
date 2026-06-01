@@ -7,6 +7,9 @@ import '../../workout/data/workout_repository.dart';
 
 DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
+/// Rolling window (days) for the "this week" stat.
+const _thisWeekDays = 7;
+
 /// One workout's contribution to a single exercise's progress series.
 class ExerciseDataPoint {
   const ExerciseDataPoint({
@@ -83,7 +86,7 @@ List<ExerciseDataPoint> exerciseHistory(
 OverallStats overallStats(List<Workout> workouts, DateTime asOf) {
   if (workouts.isEmpty) return const OverallStats.empty();
   final totalVolume = workouts.fold(0.0, (s, w) => s + w.totalVolume);
-  final weekAgo = asOf.subtract(const Duration(days: 7));
+  final weekAgo = asOf.subtract(const Duration(days: _thisWeekDays));
   final thisWeek = workouts.where((w) => w.date.isAfter(weekAgo)).length;
 
   final days = workouts.map((w) => _dateOnly(w.date)).toSet();
@@ -111,6 +114,9 @@ class ProgressRepository {
   ProgressRepository(this._workouts);
 
   final WorkoutRepository _workouts;
+
+  /// Caps reads at the most-recent N workouts — stats/streak/history reflect
+  /// this window (ample for an MVP; revisit if a user exceeds it).
   static const _historyLimit = 200;
 
   Future<List<ExerciseDataPoint>> historyFor(

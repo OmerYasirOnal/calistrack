@@ -49,6 +49,21 @@ void main() {
       expect(exerciseHistory(workouts, 'never'), isEmpty);
     });
 
+    test('one point per workout for the same exercise across sessions', () {
+      final workouts = [
+        _w('2026-06-02', [
+          _le('pull_up', const [LoggedSet(reps: 8)]),
+        ]),
+        _w('2026-05-28', [
+          _le('pull_up', const [LoggedSet(reps: 6), LoggedSet(reps: 5)]),
+        ]),
+      ];
+      final history = exerciseHistory(workouts, 'pull_up');
+      expect(history, hasLength(2)); // one point per workout, not per set
+      expect(history.first.totalReps, 11); // earliest session: 6 + 5
+      expect(history.last.totalReps, 8);
+    });
+
     test('aggregates cardio distance', () {
       final workouts = [
         _w('2026-06-01', [

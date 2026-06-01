@@ -31,14 +31,14 @@ Each task links to its GitHub issue once created.
 | T8 | Auth UI + gated routing | DONE | #66 | — |
 | T9 | Profile bootstrap | DONE | #66 | — |
 
-## M3 — Programs & Workout
+## M3 — Programs & Workout  ✅ (complete; issue #3 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
 | T10 | Exercise library + repo | DONE | #3 | #7 |
 | T11 | Program repo + presets | DONE | #3 | #8 |
 | T12 | Programs screen | DONE | #3 | #9 |
-| T13 | Today screen | REVIEW | #3 | — |
-| T14 | Set logging | REVIEW | #3 | — |
+| T13 | Today screen | DONE | #3 | #10 |
+| T14 | Set logging | DONE | #3 | #10 |
 
 ## M4 — Progress & Skills
 | Task | Title | Status | Issue | PR |

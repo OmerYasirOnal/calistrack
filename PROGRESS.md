@@ -4,6 +4,17 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M3 T10 Exercise library repo [branch feat/calistrack-m3-t10-exercise-repo]
+- **Task:** ExerciseRepository — load the bundled movement library from assets.
+- **Added:** `features/exercises/data/exercise_repository.dart` (injectable
+  `AssetBundle`, in-memory cache, `all()` + `byId()`) with
+  `exerciseRepositoryProvider` + `exerciseLibraryProvider`. Tests:
+  `test/features/exercises/exercise_repository_test.dart` — real-asset load
+  (19 unique, well-formed movements), `byId` hit/miss, cache identity, and an
+  injected-fixture parse proving the loader is unit-testable.
+- **Also:** corrected the design spec's library count (18 → 19).
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 18/18 pass.
+
 ## 2026-06-01 — M2 Auth (T6–T9) [branch feat/calistrack-m2-auth]
 - **Task:** Firebase-backed auth — email + Google sign-in, gated routing,
   profile bootstrap.

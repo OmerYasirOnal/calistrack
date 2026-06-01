@@ -4,6 +4,29 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M3 T13+T14 Today + session engine + set logging [branch feat/calistrack-m3-t13-today-logging]
+- **Task:** the core loop — pick a program day, log sets, finish to a summary.
+- **Data:** `features/workout/data/workout_repository.dart` (save + recent +
+  `lastSetsFor` for the "last time" reference), `training_defaults.dart` +
+  `assets/data/training_defaults.json` (rest-by-type, no magic numbers).
+- **Engine:** `features/workout/application/workout_session.dart` — immutable
+  `WorkoutSession` (completion% + volume + `toWorkout`) and a **keepAlive**
+  `WorkoutSessionController` (startDay/logSet/removeSet/finish→persist).
+  `lastSetsForProvider` family. Reintroduced `activeProgramProvider` (now
+  **awaits** the profile, fixing a flash-of-empty-state).
+- **UI:** `today_screen.dart` (empty state → day-picker chips → live header
+  (progress + volume) → finish), `widgets/exercise_logger_card.dart` (per-set
+  steppers for reps/weight/hold/distance/duration, logged chips, last-time ref,
+  post-set rest countdown), `session_summary.dart` (completion dialog).
+- **Preview:** `lib/preview.dart` — fake-backed entrypoint
+  (`flutter run -t lib/preview.dart`) that boots into a seeded Push session, so
+  the authed UI is runnable/screenshottable without Firebase.
+- **Tests:** session-engine logic (log/edit/finish/volume/completion/toWorkout)
+  + Today widget flow (pick day → log → finish → summary) + empty state; smoke
+  & splash tests updated for the real Today screen.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 35/35 pass
+  · preview web build screenshotted (logging UX).
+
 ## 2026-06-01 — M3 T12 Programs screen [branch feat/calistrack-m3-t12-programs-screen]
 - **Task:** browse presets, open a program's day/movement breakdown, set it active.
 - **Added:** `programs/presentation/programs_screen.dart` (real list, replaces

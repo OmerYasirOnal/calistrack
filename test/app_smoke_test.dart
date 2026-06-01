@@ -25,8 +25,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Today is the initial tab.
-    expect(find.text("Today's workout will appear here."), findsOneWidget);
+    // Today is the initial tab (no active program yet → empty state).
+    expect(find.text('No active program yet'), findsOneWidget);
 
     // All five destinations are present.
     for (final label in [

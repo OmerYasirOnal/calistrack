@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
+import 'package:calistrack/features/workout/data/workout_repository.dart';
 import 'package:calistrack/models/app_user.dart';
+import 'package:calistrack/models/workout.dart';
+import 'package:collection/collection.dart';
 
 /// In-memory [AuthRepository] for tests. Emits an initial user (or null) and
 /// records calls so behaviour can be asserted without Firebase.
@@ -140,5 +143,32 @@ class FakeUserRepository implements UserRepository {
       activeProgramId: programId,
     );
     _emit(uid);
+  }
+}
+
+/// In-memory [WorkoutRepository] for tests. Records saves and serves a
+/// configurable last-sets map.
+class FakeWorkoutRepository implements WorkoutRepository {
+  final List<Workout> saved = [];
+  final Map<String, List<LoggedSet>> lastSets = {};
+
+  @override
+  Future<void> save(String uid, Workout workout) async => saved.add(workout);
+
+  @override
+  Future<List<Workout>> recent(String uid, {int limit = 20}) async {
+    final sorted = [...saved]..sort((a, b) => b.date.compareTo(a.date));
+    return sorted.take(limit).toList();
+  }
+
+  @override
+  Future<List<LoggedSet>> lastSetsFor(String uid, String exerciseId) async {
+    if (lastSets.containsKey(exerciseId)) return lastSets[exerciseId]!;
+    for (final w in await recent(uid)) {
+      final logged =
+          w.exercises.firstWhereOrNull((e) => e.exerciseId == exerciseId);
+      if (logged != null && logged.sets.isNotEmpty) return logged.sets;
+    }
+    return const [];
   }
 }

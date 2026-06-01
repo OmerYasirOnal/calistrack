@@ -18,7 +18,7 @@ and the active-program pointer touch **Firestore**.
 ## Architecture
 
 ### Data layer (repositories + providers)
-- **ExerciseRepository** (T10) — loads the 18-movement library from
+- **ExerciseRepository** (T10) — loads the 19-movement library from
   `assets/data/exercises.json`; `Future<List<Exercise>> all()` + `Exercise? byId(id)`,
   in-memory cached. Provider: `exerciseLibraryProvider` (FutureProvider).
 - **ProgramRepository** (T11) — preset programs from a new

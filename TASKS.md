@@ -34,7 +34,7 @@ Each task links to its GitHub issue once created.
 ## M3 — Programs & Workout
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T10 | Exercise library + repo | TODO | — | — |
+| T10 | Exercise library + repo | REVIEW | #3 | — |
 | T11 | Program repo + presets | TODO | — | — |
 | T12 | Programs screen | TODO | — | — |
 | T13 | Today screen | TODO | — | — |

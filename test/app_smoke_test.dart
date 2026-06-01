@@ -1,11 +1,28 @@
 import 'package:calistrack/app.dart';
+import 'package:calistrack/features/auth/data/auth_repository.dart';
+import 'package:calistrack/features/profile/data/user_repository.dart';
+import 'package:calistrack/models/app_user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/fakes.dart';
+
 void main() {
-  testWidgets('app boots to the Today tab with a five-destination nav',
+  testWidgets('a signed-in user boots to the Today tab with five destinations',
       (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: CalisTrackApp()));
+    final auth = FakeAuthRepository(
+      initialUser: const AppUser(uid: 'u1', email: 'a@b.com', displayName: 'A'),
+    );
+    final users = FakeUserRepository();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          userRepositoryProvider.overrideWithValue(users),
+        ],
+        child: const CalisTrackApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // Today is the initial tab.

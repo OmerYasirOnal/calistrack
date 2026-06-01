@@ -4,6 +4,24 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M2 Auth (T6–T9) [branch feat/calistrack-m2-auth]
+- **Task:** Firebase-backed auth — email + Google sign-in, gated routing,
+  profile bootstrap.
+- **Changed:** `core/providers/firebase_providers.dart`,
+  `features/auth/data/auth_repository.dart` (+`authStateProvider`),
+  `features/profile/data/user_repository.dart` (`ensureProfile` = T9),
+  `features/auth/application/auth_controller.dart`,
+  `features/auth/presentation/{login,register}_screen.dart` + `auth_form_fields`,
+  `core/router/app_router.dart` → `goRouterProvider` w/ auth gate,
+  `app.dart` → ConsumerWidget, `features/profile/presentation/profile_screen.dart`.
+  Tests: `auth_controller_test`, `login_screen_test`, updated `app_smoke_test`,
+  `test/support/fakes.dart`.
+- **Process note:** code-signing only works from the main checkout, not linked
+  worktrees — so milestones are developed in the main checkout on feature
+  branches (worktree commit attempts fail signing). Lost the first worktree copy
+  to a bad `worktree remove` and recreated it here.
+- **Verified locally (Flutter 3.44.0):** format clean · analyze clean · 13/13 pass.
+
 ## 2026-06-01 — Local Flutter toolchain + verified-green M1
 - Installed **Flutter 3.44.0 stable** in the session container (network policy
   allows storage.googleapis.com), ending blind CI iteration. All future

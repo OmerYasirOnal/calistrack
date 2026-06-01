@@ -23,13 +23,13 @@ Each task links to its GitHub issue once created.
 | T4 | Data models + JSON + tests | DONE | #65 | #64 |
 | T5 | GitHub Actions CI | DONE | #65 | #64 |
 
-## M2 — Auth
+## M2 — Auth  ✅ (verified locally on Flutter 3.44.0; in review)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T6 | Firebase bootstrap | TODO | — | — |
-| T7 | Auth repository | TODO | — | — |
-| T8 | Auth UI + gated routing | TODO | — | — |
-| T9 | Profile bootstrap | TODO | — | — |
+| T6 | Firebase bootstrap (providers) | DONE | #66 | — |
+| T7 | Auth repository (email/Google) | DONE | #66 | — |
+| T8 | Auth UI + gated routing | DONE | #66 | — |
+| T9 | Profile bootstrap | DONE | #66 | — |
 
 ## M3 — Programs & Workout
 | Task | Title | Status | Issue | PR |

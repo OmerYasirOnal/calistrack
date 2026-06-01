@@ -1,0 +1,106 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import '../../../core/providers/firebase_providers.dart';
+import '../../../models/app_user.dart';
+
+/// Auth abstraction so the app and tests depend on `AppUser`, never on the
+/// concrete Firebase types.
+abstract interface class AuthRepository {
+  /// Emits the current user (or null) and every subsequent change.
+  Stream<AppUser?> authStateChanges();
+
+  AppUser? get currentUser;
+
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
+  });
+
+  Future<void> registerWithEmail({
+    required String email,
+    required String password,
+    String displayName,
+  });
+
+  Future<void> signInWithGoogle();
+
+  Future<void> signOut();
+}
+
+/// Maps a Firebase [User] to the app's [AppUser]. Profile fields beyond the
+/// auth identity live in Firestore (see `UserRepository`).
+AppUser? mapFirebaseUser(User? user) => user == null
+    ? null
+    : AppUser(
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? '',
+      );
+
+class FirebaseAuthRepository implements AuthRepository {
+  FirebaseAuthRepository(this._auth, this._googleSignIn);
+
+  final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn;
+
+  @override
+  Stream<AppUser?> authStateChanges() =>
+      _auth.authStateChanges().map(mapFirebaseUser);
+
+  @override
+  AppUser? get currentUser => mapFirebaseUser(_auth.currentUser);
+
+  @override
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
+  }) =>
+      _auth.signInWithEmailAndPassword(email: email, password: password);
+
+  @override
+  Future<void> registerWithEmail({
+    required String email,
+    required String password,
+    String displayName = '',
+  }) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    if (displayName.isNotEmpty) {
+      await cred.user?.updateDisplayName(displayName);
+    }
+  }
+
+  @override
+  Future<void> signInWithGoogle() async {
+    final googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) return; // user cancelled the picker
+    final googleAuth = await googleUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await _auth.signInWithCredential(credential);
+  }
+
+  @override
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+  }
+}
+
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => FirebaseAuthRepository(
+    ref.watch(firebaseAuthProvider),
+    ref.watch(googleSignInProvider),
+  ),
+);
+
+/// The single source of truth for "who is signed in". Drives router gating.
+final authStateProvider = StreamProvider<AppUser?>(
+  (ref) => ref.watch(authRepositoryProvider).authStateChanges(),
+);

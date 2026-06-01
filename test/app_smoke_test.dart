@@ -13,7 +13,13 @@ void main() {
     expect(find.text("Today's workout will appear here."), findsOneWidget);
 
     // All five destinations are present.
-    for (final label in ['Today', 'Programs', 'Progress', 'Skills', 'Profile']) {
+    for (final label in [
+      'Today',
+      'Programs',
+      'Progress',
+      'Skills',
+      'Profile',
+    ]) {
       expect(find.text(label), findsWidgets);
     }
 

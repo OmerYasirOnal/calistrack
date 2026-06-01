@@ -4,6 +4,23 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-01 — M1 review + CI fix
+- **Review:** Fresh zero-context agent audited the M1 diff against the CI gates
+  (`dart format`, `flutter analyze`, `flutter test`).
+- **Findings & resolution:**
+  - Two `dart format` wraps (`models_test.dart` SkillLog, `app_smoke_test.dart`
+    for-loop) → pre-wrapped to match `dart format` output.
+  - One `require_trailing_commas` lint (`models_test.dart` ProgramDay) → fixed.
+  - Agent also flagged `Color.withValues`/`CardThemeData` as "3.22 blockers".
+    **Overridden:** CI runs *latest stable* Flutter (≥3.27) where these are the
+    correct, non-deprecated APIs; switching to `withOpacity`/`CardTheme` would
+    fail analyze on deprecation infos. Instead bumped pubspec floor to
+    flutter ≥3.27 / Dart ≥3.6 so the manifest matches the APIs used.
+  - Removed unused codegen dev-deps (build_runner/riverpod_generator/
+    hive_generator) + riverpod_annotation to avoid `analyzer` resolution
+    conflicts on latest stable; they return when codegen is actually used.
+- **Result:** Pending CI re-run on PR #64.
+
 ## 2026-06-01 — T1–T5 Foundation (M1)
 - **Task:** Bootstrap the CalisTrack Flutter project (scaffold, theme, router, models, CI).
 - **Changed:**

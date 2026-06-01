@@ -39,14 +39,17 @@ void main() {
         source: ProgramSource.preset,
         createdAt: DateTime.utc(2026, 6, 1),
         days: const [
-          ProgramDay(label: 'Push', exercises: [
-            ProgramExercise(
-              exerciseId: 'dip',
-              name: 'Dip',
-              targetSets: 4,
-              targetReps: 10,
-            ),
-          ]),
+          ProgramDay(
+            label: 'Push',
+            exercises: [
+              ProgramExercise(
+                exerciseId: 'dip',
+                name: 'Dip',
+                targetSets: 4,
+                targetReps: 10,
+              ),
+            ],
+          ),
           ProgramDay(label: 'Rest', exercises: []),
         ],
       );
@@ -104,7 +107,11 @@ void main() {
           SkillStep(id: 'full', name: 'Full'),
         ],
         logs: [
-          SkillLog(date: DateTime.utc(2026, 6, 1), stepId: 'tuck', holdSeconds: 10),
+          SkillLog(
+            date: DateTime.utc(2026, 6, 1),
+            stepId: 'tuck',
+            holdSeconds: 10,
+          ),
         ],
       );
       final decoded = SkillProgress.fromJson(skill.toJson());

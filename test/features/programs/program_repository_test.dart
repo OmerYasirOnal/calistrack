@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:calistrack/features/exercises/data/exercise_repository.dart';
 import 'package:calistrack/features/programs/data/program_repository.dart';
+import 'package:calistrack/models/exercise.dart';
 import 'package:calistrack/models/program.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,21 +45,42 @@ void main() {
       expect(allMoves.every((e) => e.name.isNotEmpty), isTrue);
     });
 
-    test('preset-integrity: every exerciseId exists in the library', () async {
+    test('preset-integrity: ids resolve and targets fit the movement type',
+        () async {
       final library = await ExerciseRepository().all();
-      final libraryIds = library.map((e) => e.id).toSet();
-      final programs = await ProgramRepository().presets(library);
+      final byId = {for (final e in library) e.id: e};
 
-      final referenced = programs
-          .expand((p) => p.days)
-          .expand((d) => d.exercises)
-          .map((e) => e.exerciseId);
-      for (final id in referenced) {
-        expect(
-          libraryIds,
-          contains(id),
-          reason: 'preset references unknown exercise "$id"',
-        );
+      // Parse the raw asset directly so this gate does NOT depend on the
+      // repository's own resolution (which throws on bad ids) — it is the
+      // real safety net for hand-authored presets.
+      final raw = await rootBundle.loadString('assets/data/programs.json');
+      final programs = (json.decode(raw) as List).cast<Map<String, dynamic>>();
+
+      for (final program in programs) {
+        final pid = program['id'];
+        for (final day
+            in (program['days'] as List).cast<Map<String, dynamic>>()) {
+          for (final ex
+              in (day['exercises'] as List).cast<Map<String, dynamic>>()) {
+            final id = ex['exerciseId'] as String;
+            final movement = byId[id];
+            expect(movement, isNotNull, reason: 'unknown id "$id" in $pid');
+
+            // the supplied target must match how the movement is measured
+            final requiredKey = switch (movement!.type) {
+              ExerciseType.reps || ExerciseType.weightedReps => 'targetReps',
+              ExerciseType.hold => 'targetHoldSeconds',
+              ExerciseType.distance => 'targetDistanceMeters',
+              ExerciseType.time => 'targetDurationSeconds',
+            };
+            expect(
+              ex.containsKey(requiredKey),
+              isTrue,
+              reason:
+                  '"$id" (${movement.type.name}) needs $requiredKey in $pid',
+            );
+          }
+        }
       }
     });
 

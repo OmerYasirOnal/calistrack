@@ -54,6 +54,13 @@ void main() {
       final second = await repo.all();
       expect(identical(first, second), isTrue);
     });
+
+    test('concurrent first calls share one load (stable identity)', () async {
+      final repo = ExerciseRepository();
+      final results = await Future.wait([repo.all(), repo.all(), repo.all()]);
+      expect(identical(results[0], results[1]), isTrue);
+      expect(identical(results[1], results[2]), isTrue);
+    });
   });
 
   group('ExerciseRepository (injected bundle)', () {

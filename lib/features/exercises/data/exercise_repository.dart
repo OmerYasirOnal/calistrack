@@ -23,15 +23,23 @@ class ExerciseRepository {
   final String _assetPath;
 
   List<Exercise>? _cache;
+  Future<List<Exercise>>? _loading;
 
   AssetBundle get _assets => _bundle ?? rootBundle;
 
-  /// Every movement in the library, cached after the first load.
-  Future<List<Exercise>> all() async {
+  /// Every movement in the library, cached after the first load. The in-flight
+  /// future is memoized so concurrent first calls share one parse (and the
+  /// cached list keeps a stable identity).
+  Future<List<Exercise>> all() {
     final cached = _cache;
-    if (cached != null) return cached;
+    if (cached != null) return Future.value(cached);
+    return _loading ??= _load();
+  }
 
+  Future<List<Exercise>> _load() async {
     final raw = await _assets.loadString(_assetPath);
+    // The library is a trusted, build-time-validated asset; a malformed payload
+    // surfaces as an AsyncError through the provider rather than crashing.
     final decoded = json.decode(raw) as List<dynamic>;
     final exercises = decoded
         .map((e) => Exercise.fromJson(e as Map<String, dynamic>))

@@ -4,6 +4,14 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M6 T24 CI coverage gate [branch feat/calistrack-m6-t24-coverage]
+- **Task:** enforce test coverage in CI.
+- **Added:** CI `ci.yml` now runs `flutter test --coverage` + a **line-coverage
+  gate (≥ 75%)** that parses `coverage/lcov.info` and fails the build below the
+  bar. `coverage/` gitignored.
+- **Current coverage:** **80.1%** (1503/1876 lines) — comfortably above the gate.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 69/69 pass.
+
 ## 2026-06-02 — M6 T22+T23 Offline persistence + a11y polish [branch feat/calistrack-m6-t22-offline]
 - **T22 Offline:** enable Firestore persistence explicitly in `main.dart`
   (`Settings(persistenceEnabled: true, cacheSizeBytes: CACHE_SIZE_UNLIMITED)`),

@@ -8,6 +8,7 @@ build/
 .pub/
 pubspec.lock
 *.g.dart.lock
+coverage/
 
 # IDE
 .idea/

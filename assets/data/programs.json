@@ -1,0 +1,129 @@
+[
+  {
+    "id": "classic_ppl",
+    "name": "Classic PPL",
+    "description": "The timeless push / pull / legs split — three focused days a week.",
+    "days": [
+      {
+        "label": "Push",
+        "exercises": [
+          { "exerciseId": "push_up", "targetSets": 3, "targetReps": 12 },
+          { "exerciseId": "pike_push_up", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "dip", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "diamond_push_up", "targetSets": 2, "targetReps": 10 }
+        ]
+      },
+      {
+        "label": "Pull",
+        "exercises": [
+          { "exerciseId": "pull_up", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "australian_row", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "chin_up", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "scapular_pull", "targetSets": 2, "targetReps": 10 }
+        ]
+      },
+      {
+        "label": "Legs",
+        "exercises": [
+          { "exerciseId": "pistol_squat", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "bulgarian_split_squat", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "nordic_curl", "targetSets": 3, "targetReps": 5 },
+          { "exerciseId": "calf_raise", "targetSets": 3, "targetReps": 15 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ppl_core",
+    "name": "PPL + Core",
+    "description": "Push / pull / legs with a dedicated core day for midline strength.",
+    "days": [
+      {
+        "label": "Push",
+        "exercises": [
+          { "exerciseId": "push_up", "targetSets": 3, "targetReps": 12 },
+          { "exerciseId": "pike_push_up", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "dip", "targetSets": 3, "targetReps": 8 }
+        ]
+      },
+      {
+        "label": "Pull",
+        "exercises": [
+          { "exerciseId": "pull_up", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "australian_row", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "chin_up", "targetSets": 3, "targetReps": 6 }
+        ]
+      },
+      {
+        "label": "Legs",
+        "exercises": [
+          { "exerciseId": "pistol_squat", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "bulgarian_split_squat", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "calf_raise", "targetSets": 3, "targetReps": 15 }
+        ]
+      },
+      {
+        "label": "Core",
+        "exercises": [
+          { "exerciseId": "hanging_leg_raise", "targetSets": 3, "targetReps": 12 },
+          { "exerciseId": "plank", "targetSets": 3, "targetHoldSeconds": 45 },
+          { "exerciseId": "hollow_hold", "targetSets": 3, "targetHoldSeconds": 30 },
+          { "exerciseId": "l_sit", "targetSets": 3, "targetHoldSeconds": 15 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundations",
+    "name": "Foundations",
+    "description": "A beginner full-body day to run three times a week.",
+    "days": [
+      {
+        "label": "Full Body",
+        "exercises": [
+          { "exerciseId": "push_up", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "australian_row", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "bulgarian_split_squat", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "plank", "targetSets": 3, "targetHoldSeconds": 30 },
+          { "exerciseId": "hollow_hold", "targetSets": 3, "targetHoldSeconds": 20 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hybrid",
+    "name": "Hybrid",
+    "description": "Calisthenics strength plus a conditioning run — four mixed days.",
+    "days": [
+      {
+        "label": "Push",
+        "exercises": [
+          { "exerciseId": "push_up", "targetSets": 3, "targetReps": 10 },
+          { "exerciseId": "pike_push_up", "targetSets": 3, "targetReps": 6 },
+          { "exerciseId": "dip", "targetSets": 3, "targetReps": 6 }
+        ]
+      },
+      {
+        "label": "Pull",
+        "exercises": [
+          { "exerciseId": "pull_up", "targetSets": 3, "targetReps": 5 },
+          { "exerciseId": "australian_row", "targetSets": 3, "targetReps": 10 }
+        ]
+      },
+      {
+        "label": "Legs",
+        "exercises": [
+          { "exerciseId": "bulgarian_split_squat", "targetSets": 3, "targetReps": 8 },
+          { "exerciseId": "calf_raise", "targetSets": 3, "targetReps": 15 }
+        ]
+      },
+      {
+        "label": "Run",
+        "exercises": [
+          { "exerciseId": "easy_run", "targetSets": 1, "targetDistanceMeters": 5000 },
+          { "exerciseId": "intervals", "targetSets": 6, "targetDurationSeconds": 60 }
+        ]
+      }
+    ]
+  }
+]

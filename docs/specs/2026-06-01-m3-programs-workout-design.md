@@ -108,11 +108,11 @@ Presets → `programs.json`. Rest-timer + rep-range + default cardio targets →
 ## Task breakdown & order (per-task PR + zero-context adversarial review)
 - **T10** ExerciseRepository + provider + tests.
 - **T11** Model cardio extension + ProgramRepository + `programs.json` +
-  `training_defaults.json` + integrity test.
+  integrity test.
 - **T12** Programs screen (list + detail + set-active).
 - **T13 + T14** Today screen + `workoutSessionProvider` + set logging
-  (reps/weight/hold/distance/time) + rest/run timer + summary (built together —
-  tightly coupled).
+  (reps/weight/hold/distance/time) + rest/run timer + `training_defaults.json`
+  (rest + cardio defaults) + summary (built together — tightly coupled).
 Each: branch off `main` → code → `dart format`/`analyze`/`test` green → update
 `PROGRESS.md`/`TASKS.md` → conventional commit → PR → fresh zero-context
 adversarial review → fix → merge → screenshot running.

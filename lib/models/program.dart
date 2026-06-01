@@ -6,6 +6,8 @@ class ProgramExercise {
     required this.targetSets,
     this.targetReps,
     this.targetHoldSeconds,
+    this.targetDistanceMeters,
+    this.targetDurationSeconds,
     this.notes = '',
   });
 
@@ -13,11 +15,17 @@ class ProgramExercise {
   final String name;
   final int targetSets;
 
-  /// Target reps per set (null for hold/time based movements).
+  /// Target reps per set (null for hold/distance/time based movements).
   final int? targetReps;
 
   /// Target hold seconds per set (null for rep based movements).
   final int? targetHoldSeconds;
+
+  /// Target distance in metres per set (cardio, e.g. a 5 km run).
+  final int? targetDistanceMeters;
+
+  /// Target duration in seconds per set (timed efforts/intervals).
+  final int? targetDurationSeconds;
   final String notes;
 
   factory ProgramExercise.fromJson(Map<String, dynamic> json) =>
@@ -27,6 +35,8 @@ class ProgramExercise {
         targetSets: (json['targetSets'] as num?)?.toInt() ?? 3,
         targetReps: (json['targetReps'] as num?)?.toInt(),
         targetHoldSeconds: (json['targetHoldSeconds'] as num?)?.toInt(),
+        targetDistanceMeters: (json['targetDistanceMeters'] as num?)?.toInt(),
+        targetDurationSeconds: (json['targetDurationSeconds'] as num?)?.toInt(),
         notes: json['notes'] as String? ?? '',
       );
 
@@ -36,6 +46,10 @@ class ProgramExercise {
         'targetSets': targetSets,
         if (targetReps != null) 'targetReps': targetReps,
         if (targetHoldSeconds != null) 'targetHoldSeconds': targetHoldSeconds,
+        if (targetDistanceMeters != null)
+          'targetDistanceMeters': targetDistanceMeters,
+        if (targetDurationSeconds != null)
+          'targetDurationSeconds': targetDurationSeconds,
         'notes': notes,
       };
 }

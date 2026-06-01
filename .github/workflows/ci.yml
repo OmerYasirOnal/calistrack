@@ -37,9 +37,9 @@ jobs:
 
       - name: Coverage gate (line coverage >= 75%)
         run: |
-          pct=$(awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{if(lf>0)printf "%.1f",lh/lf*100;else print "0"}' coverage/lcov.info)
+          pct=$(LC_ALL=C awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{if(lf>0)printf "%.1f",lh/lf*100;else print "0"}' coverage/lcov.info)
           echo "Line coverage: ${pct}%"
-          if awk -v p="$pct" 'BEGIN{exit (p+0>=75)?0:1}'; then
+          if LC_ALL=C awk -v p="$pct" 'BEGIN{exit (p+0>=75)?0:1}'; then
             echo "Coverage gate passed."
           else
             echo "::error::Line coverage ${pct}% is below the 75% gate"

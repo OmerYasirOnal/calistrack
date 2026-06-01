@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,13 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // Offline-first: Firestore's local cache serves reads and queues writes
+    // when offline (a separate Hive mirror would be redundant for this data —
+    // see docs/specs/2026-06-02-m6-polish-design.md). Set generously + on.
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
   } catch (e, st) {
     debugPrint('Firebase init skipped/failed (expected with placeholder): $e');

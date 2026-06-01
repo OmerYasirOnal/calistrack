@@ -101,6 +101,39 @@ void main() {
       expect(exercises.single.targetReps, 8);
     });
 
+    test('parses the real platform shape (nested Map<Object?, Object?>)',
+        () async {
+      // cloud_functions decodes nested objects as Map<Object?, Object?>, NOT
+      // Map<String, dynamic> — the parser must not cast to the latter.
+      final service = AiProgramService(
+        caller: (_) async => <String, dynamic>{
+          'name': 'AI Plan',
+          'days': <Object?>[
+            <Object?, Object?>{
+              'label': 'Push',
+              'exercises': <Object?>[
+                <Object?, Object?>{
+                  'exerciseId': 'push_up',
+                  'targetSets': 3,
+                  'targetReps': 9,
+                },
+              ],
+            },
+          ],
+        },
+      );
+      final result = await service.generate(
+        const GenerationRequest(
+          level: ExperienceLevel.beginner,
+          daysPerWeek: 1,
+        ),
+        library: _library,
+        presets: _presets,
+      );
+      expect(result.usedFallback, isFalse); // did NOT silently fall back
+      expect(result.program.days.single.exercises.single.targetReps, 9);
+    });
+
     test('falls back when the function throws', () async {
       final service =
           AiProgramService(caller: (_) async => throw Exception('x'));

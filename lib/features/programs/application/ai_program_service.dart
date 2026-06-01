@@ -62,7 +62,10 @@ class AiProgramService {
         program: _toProgram(raw, library),
         usedFallback: false,
       );
-    } catch (_) {
+    } on Exception catch (_) {
+      // Only fall back on *expected* failures (function unavailable, bad
+      // response). Programming Errors (e.g. a bad cast) propagate so they are
+      // never silently masked as a "fallback".
       return GenerationResult(
         program: fallbackProgram(request, presets),
         usedFallback: true,
@@ -72,11 +75,14 @@ class AiProgramService {
 
   Program _toProgram(Map<String, dynamic> raw, List<Exercise> library) {
     final byId = {for (final e in library) e.id: e};
-    final days = (raw['days'] as List<dynamic>? ?? [])
-        .map((d) => d as Map<String, dynamic>)
+    // Nested values from cloud_functions arrive as Map<Object?, Object?> on a
+    // real device (StandardMessageCodec) — read them as plain Map, never cast
+    // to Map<String, dynamic>.
+    final days = ((raw['days'] as List?) ?? const [])
+        .map((d) => d as Map)
         .map((d) {
-          final exercises = (d['exercises'] as List<dynamic>? ?? [])
-              .map((e) => e as Map<String, dynamic>)
+          final exercises = ((d['exercises'] as List?) ?? const [])
+              .map((e) => e as Map)
               .where((e) => byId.containsKey(e['exerciseId']))
               .map((e) {
             final movement = byId[e['exerciseId']]!;
@@ -124,6 +130,8 @@ Program fallbackProgram(GenerationRequest request, List<Program> presets) {
               ? presets.first
               : const Program(id: 'empty', name: 'Plan', days: []));
   final goal = request.goals.isNotEmpty ? request.goals.first : 'custom';
+  // One fallback per cadence (id keyed on daysPerWeek): regenerating for the
+  // same days/week replaces the prior fallback rather than piling up clones.
   return base.copyWith(
     id: 'gen_fallback_${request.daysPerWeek}',
     name: 'Your $goal plan',

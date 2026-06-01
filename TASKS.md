@@ -35,8 +35,8 @@ Each task links to its GitHub issue once created.
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
 | T10 | Exercise library + repo | DONE | #3 | #7 |
-| T11 | Program repo + presets | REVIEW | #3 | — |
-| T12 | Programs screen | TODO | — | — |
+| T11 | Program repo + presets | DONE | #3 | #8 |
+| T12 | Programs screen | REVIEW | #3 | — |
 | T13 | Today screen | TODO | — | — |
 | T14 | Set logging | TODO | — | — |
 

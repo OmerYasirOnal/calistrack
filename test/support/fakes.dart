@@ -76,23 +76,69 @@ class FakeAuthRepository implements AuthRepository {
   }
 }
 
-/// In-memory [UserRepository] for tests.
+/// In-memory [UserRepository] for tests. `watch` is backed by a broadcast
+/// stream so updates (e.g. setActiveProgram) are observed live.
 class FakeUserRepository implements UserRepository {
   final Map<String, AppUser> store = {};
   int ensureCalls = 0;
+  int setActiveCalls = 0;
+
+  final Map<String, StreamController<AppUser?>> _controllers = {};
+
+  StreamController<AppUser?> _controllerFor(String uid) =>
+      _controllers.putIfAbsent(
+        uid,
+        () => StreamController<AppUser?>.broadcast(),
+      );
+
+  void _emit(String uid) => _controllerFor(uid).add(store[uid]);
+
+  void dispose() {
+    for (final c in _controllers.values) {
+      c.close();
+    }
+  }
 
   @override
   Future<AppUser?> fetch(String uid) async => store[uid];
 
   @override
-  Stream<AppUser?> watch(String uid) => Stream.value(store[uid]);
+  Stream<AppUser?> watch(String uid) async* {
+    yield store[uid];
+    yield* _controllerFor(uid).stream;
+  }
 
   @override
-  Future<void> upsert(AppUser user) async => store[user.uid] = user;
+  Future<void> upsert(AppUser user) async {
+    store[user.uid] = user;
+    _emit(user.uid);
+  }
 
   @override
   Future<AppUser> ensureProfile(AppUser authUser) async {
     ensureCalls++;
-    return store.putIfAbsent(authUser.uid, () => authUser);
+    final user = store.putIfAbsent(authUser.uid, () => authUser);
+    _emit(authUser.uid);
+    return user;
+  }
+
+  @override
+  Future<void> setActiveProgram(String uid, String? programId) async {
+    setActiveCalls++;
+    final base =
+        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
+    // Constructed explicitly (not copyWith) so a null programId truly *clears*
+    // the active program — mirroring the Firestore merge write.
+    store[uid] = AppUser(
+      uid: base.uid,
+      email: base.email,
+      displayName: base.displayName,
+      heightCm: base.heightCm,
+      weightKg: base.weightKg,
+      level: base.level,
+      goals: base.goals,
+      activeProgramId: programId,
+    );
+    _emit(uid);
   }
 }

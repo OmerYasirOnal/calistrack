@@ -15,6 +15,10 @@ abstract interface class UserRepository {
   /// Creates the profile doc on first login if it does not already exist,
   /// returning the persisted profile (existing or freshly created).
   Future<AppUser> ensureProfile(AppUser authUser);
+
+  /// Sets (or clears, when null) the user's active program — a targeted merge
+  /// that never rewrites the rest of the profile.
+  Future<void> setActiveProgram(String uid, String? programId);
 }
 
 class FirestoreUserRepository implements UserRepository {
@@ -49,6 +53,12 @@ class FirestoreUserRepository implements UserRepository {
     await upsert(authUser);
     return authUser;
   }
+
+  @override
+  Future<void> setActiveProgram(String uid, String? programId) => _doc(uid).set(
+        {'activeProgramId': programId},
+        SetOptions(merge: true),
+      );
 }
 
 final userRepositoryProvider = Provider<UserRepository>(

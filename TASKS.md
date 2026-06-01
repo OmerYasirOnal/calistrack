@@ -1,5 +1,16 @@
 # CalisTrack — Task Board
 
+## ⭐ TOP-PRIORITY FOLLOW-UP (do first, from a local machine)
+- **T0 — Migrate CalisTrack to its own dedicated public GitHub repo.**
+  Right now it lives under `calistrack/` inside `OmerYasirOnal/studio` only because
+  this remote session is scoped to that repo and a fresh repo can't be pushed to
+  locally from the container. When the owner is at their own computer, extract
+  `calistrack/` into a **new standalone public repo** (preserve history via
+  `git subtree split` / `git filter-repo`), move the CI workflow to that repo's
+  root `.github/workflows/`, migrate the M1–M6 issues/labels, and update remotes.
+  This is important — it removes the framework-vs-app rule conflict entirely.
+
+
 Status legend: `TODO` · `DOING` · `REVIEW` · `DONE`
 Each task links to its GitHub issue once created.
 

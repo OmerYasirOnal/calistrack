@@ -48,12 +48,12 @@ Each task links to its GitHub issue once created.
 | T17 | Skill model + preset trees | DONE | #4 | #13 |
 | T18 | Skills screen | DONE | #4 | #14 |
 
-## M5 — AI generation
+## M5 — AI generation  ✅ (complete; issue #5 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T19 | generateProgram Cloud Function | REVIEW | #5 | — |
-| T20 | Client parse/persist + fallback | REVIEW | #5 | — |
-| T21 | AI generation UI | REVIEW | #5 | — |
+| T19 | generateProgram Cloud Function | DONE | #5 | #15 |
+| T20 | Client parse/persist + fallback | DONE | #5 | #16 |
+| T21 | AI generation UI | DONE | #5 | #17 |
 
 ## M6 — Polish
 | Task | Title | Status | Issue | PR |

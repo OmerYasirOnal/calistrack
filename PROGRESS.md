@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M5 T19 generateProgram Cloud Function [branch feat/calistrack-m5-t19-generate-function]
+- **Task:** server-side AI program generation (OpenAI), deploy-ready.
+- **Added:** `functions/` (TS) — `generateProgram` onCall: validates the request,
+  prompts OpenAI (`gpt-4o-mini`) for strict-JSON, **sanitizes** the output
+  server-side (only known exerciseIds, ≥1 day, sane sets) and returns a
+  Program-shaped object. Key read from a Firebase **secret** `OPENAI_API_KEY`
+  (never in client/repo). `functions/{package.json,tsconfig.json,README.md,
+  .gitignore}` + root `firebase.json`. **Not deployed** (needs owner's Firebase
+  + key — see functions/README.md); the client (T20) is fallback-first so the
+  feature works meanwhile.
+- **Verified:** Flutter package unaffected (analyze clean, smoke green); secret
+  scan finds no committed key. (Node function not exercised by the Flutter CI.)
+
 ## 2026-06-02 — M4 T18 Skills screen [branch feat/calistrack-m4-t18-skills-screen]
 - **Task:** browse skill progressions, log step attempts, advance the ladder.
 - **Added:** `features/skills/presentation/skills_screen.dart` (list with

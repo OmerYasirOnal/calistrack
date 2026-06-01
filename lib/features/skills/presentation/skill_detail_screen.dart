@@ -96,8 +96,10 @@ class _SkillDetail extends ConsumerWidget {
             ),
             const SizedBox(height: Spacing.sm),
             FilledButton.icon(
-              onPressed: () =>
-                  controller.setStep(skill.id, skill.currentStepIndex + 1),
+              onPressed: () => controller.setStep(
+                skill.id,
+                (skill.currentStepIndex + 1).clamp(0, skill.steps.length),
+              ),
               icon: const Icon(Icons.arrow_upward),
               label: const Text('Mark step complete'),
             ),
@@ -122,8 +124,10 @@ class _SkillDetail extends ConsumerWidget {
           if (skill.currentStepIndex > 0) ...[
             const SizedBox(height: Spacing.sm),
             TextButton(
-              onPressed: () =>
-                  controller.setStep(skill.id, skill.currentStepIndex - 1),
+              onPressed: () => controller.setStep(
+                skill.id,
+                (skill.currentStepIndex - 1).clamp(0, skill.steps.length),
+              ),
               child: const Text('Step back'),
             ),
           ],
@@ -167,17 +171,17 @@ class _StepTile extends StatelessWidget {
 
 /// Per-step logging input — keyed by step id so it resets when the step
 /// advances. Logs reps or hold-seconds depending on the step's target.
-class _StepLogger extends ConsumerStatefulWidget {
+class _StepLogger extends StatefulWidget {
   const _StepLogger({required this.step, required this.onLog, super.key});
 
   final SkillStep step;
   final ValueChanged<SkillLog> onLog;
 
   @override
-  ConsumerState<_StepLogger> createState() => _StepLoggerState();
+  State<_StepLogger> createState() => _StepLoggerState();
 }
 
-class _StepLoggerState extends ConsumerState<_StepLogger> {
+class _StepLoggerState extends State<_StepLogger> {
   late final bool _isHold = widget.step.targetHoldSeconds != null;
   late int _value =
       widget.step.targetHoldSeconds ?? widget.step.targetReps ?? 1;
@@ -199,7 +203,7 @@ class _StepLoggerState extends ConsumerState<_StepLogger> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final step = (_value - (_isHold ? 5 : 1)).clamp(0, 9999);
+    final increment = _isHold ? 5 : 1;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),
@@ -211,7 +215,9 @@ class _StepLoggerState extends ConsumerState<_StepLogger> {
             Row(
               children: [
                 IconButton(
-                  onPressed: () => setState(() => _value = step),
+                  onPressed: () => setState(
+                    () => _value = (_value - increment).clamp(1, 9999),
+                  ),
                   icon: const Icon(Icons.remove_circle_outline),
                 ),
                 Text(
@@ -222,7 +228,7 @@ class _StepLoggerState extends ConsumerState<_StepLogger> {
                 ),
                 IconButton(
                   onPressed: () => setState(
-                    () => _value = _value + (_isHold ? 5 : 1),
+                    () => _value = (_value + increment).clamp(1, 9999),
                   ),
                   icon: const Icon(Icons.add_circle_outline),
                 ),

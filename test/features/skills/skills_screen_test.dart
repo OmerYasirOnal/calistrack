@@ -2,8 +2,10 @@ import 'package:calistrack/app.dart';
 import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/skills/data/skill_repository.dart';
+import 'package:calistrack/features/skills/presentation/skill_detail_screen.dart';
 import 'package:calistrack/models/app_user.dart';
 import 'package:calistrack/models/skill_progress.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -74,5 +76,56 @@ void main() {
     await tester.pumpAndSettle();
     expect(skills.setStepCalls, 1);
     expect(skills.saved['front_lever']?.currentStepIndex, 1);
+  });
+
+  testWidgets('completed skill shows the trophy and step-back recovers',
+      (tester) async {
+    final skills = FakeSkillRepository(_presets)
+      ..saved['pistol'] = (currentStepIndex: 1, logs: []); // 1 step → done
+    addTearDown(skills.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(
+            FakeAuthRepository(
+              initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+            ),
+          ),
+          skillRepositoryProvider.overrideWithValue(skills),
+        ],
+        child: const MaterialApp(home: SkillDetailScreen(skillId: 'pistol')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Skill complete'), findsOneWidget);
+    expect(find.text('Mark step complete'), findsNothing);
+
+    await tester.tap(find.text('Step back'));
+    await tester.pumpAndSettle();
+    expect(skills.setStepCalls, 1);
+    expect(skills.saved['pistol']?.currentStepIndex, 0);
+  });
+
+  testWidgets('unknown skill id shows not found', (tester) async {
+    final skills = FakeSkillRepository(_presets);
+    addTearDown(skills.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(
+            FakeAuthRepository(
+              initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+            ),
+          ),
+          skillRepositoryProvider.overrideWithValue(skills),
+        ],
+        child: const MaterialApp(home: SkillDetailScreen(skillId: 'nope')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Skill not found.'), findsOneWidget);
   });
 }

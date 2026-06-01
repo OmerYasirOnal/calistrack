@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
+import 'package:calistrack/features/skills/data/skill_repository.dart';
 import 'package:calistrack/features/workout/data/workout_repository.dart';
 import 'package:calistrack/models/app_user.dart';
+import 'package:calistrack/models/skill_progress.dart';
 import 'package:calistrack/models/workout.dart';
 import 'package:collection/collection.dart';
 
@@ -170,5 +172,49 @@ class FakeWorkoutRepository implements WorkoutRepository {
       if (logged != null && logged.sets.isNotEmpty) return logged.sets;
     }
     return const [];
+  }
+}
+
+/// In-memory [SkillRepository] for tests — preset trees plus a live merge of
+/// recorded progress.
+class FakeSkillRepository implements SkillRepository {
+  FakeSkillRepository(this._presets);
+
+  final List<SkillProgress> _presets;
+  final Map<String, SavedSkill> saved = {};
+  final StreamController<List<SkillProgress>> _controller =
+      StreamController<List<SkillProgress>>.broadcast();
+
+  int logCalls = 0;
+  int setStepCalls = 0;
+
+  void dispose() => _controller.close();
+
+  void _emit() => _controller.add(mergeSkills(_presets, saved));
+
+  @override
+  Future<List<SkillProgress>> presets() async => _presets;
+
+  @override
+  Stream<List<SkillProgress>> watch(String uid) async* {
+    yield mergeSkills(_presets, saved);
+    yield* _controller.stream;
+  }
+
+  @override
+  Future<void> logAttempt(String uid, String skillId, SkillLog log) async {
+    logCalls++;
+    final cur = saved[skillId] ?? (currentStepIndex: 0, logs: <SkillLog>[]);
+    saved[skillId] =
+        (currentStepIndex: cur.currentStepIndex, logs: [...cur.logs, log]);
+    _emit();
+  }
+
+  @override
+  Future<void> setStep(String uid, String skillId, int currentStepIndex) async {
+    setStepCalls++;
+    final cur = saved[skillId] ?? (currentStepIndex: 0, logs: <SkillLog>[]);
+    saved[skillId] = (currentStepIndex: currentStepIndex, logs: cur.logs);
+    _emit();
   }
 }

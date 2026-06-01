@@ -66,12 +66,14 @@ class SkillProgress {
     required this.id,
     required this.name,
     required this.steps,
+    this.description = '',
     this.currentStepIndex = 0,
     this.logs = const [],
   });
 
   final String id;
   final String name;
+  final String description;
   final List<SkillStep> steps;
   final int currentStepIndex;
   final List<SkillLog> logs;
@@ -87,6 +89,7 @@ class SkillProgress {
   factory SkillProgress.fromJson(Map<String, dynamic> json) => SkillProgress(
         id: json['id'] as String,
         name: json['name'] as String,
+        description: json['description'] as String? ?? '',
         steps: (json['steps'] as List<dynamic>? ?? [])
             .map((e) => SkillStep.fromJson(e as Map<String, dynamic>))
             .toList(),
@@ -99,6 +102,7 @@ class SkillProgress {
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
+        'description': description,
         'steps': steps.map((e) => e.toJson()).toList(),
         'currentStepIndex': currentStepIndex,
         'logs': logs.map((e) => e.toJson()).toList(),
@@ -111,6 +115,7 @@ class SkillProgress {
       SkillProgress(
         id: id,
         name: name,
+        description: description,
         steps: steps,
         currentStepIndex: currentStepIndex ?? this.currentStepIndex,
         logs: logs ?? this.logs,

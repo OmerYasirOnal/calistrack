@@ -2,6 +2,7 @@ import 'package:calistrack/app.dart';
 import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/programs/data/program_repository.dart';
+import 'package:calistrack/features/programs/data/user_program_repository.dart';
 import 'package:calistrack/features/programs/presentation/program_detail_screen.dart';
 import 'package:calistrack/features/programs/presentation/programs_screen.dart';
 import 'package:calistrack/models/app_user.dart';
@@ -96,5 +97,61 @@ void main() {
 
     expect(find.text("Couldn't load programs."), findsOneWidget);
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets('shows a "Your programs" section and dedupes preset-id clashes',
+      (tester) async {
+    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final auth = FakeAuthRepository(initialUser: me);
+    final users = FakeUserRepository()..store['u1'] = me;
+    final userPrograms = FakeUserProgramRepository();
+    addTearDown(() {
+      auth.dispose();
+      users.dispose();
+      userPrograms.dispose();
+    });
+    const foundations = Program(
+      id: 'foundations',
+      name: 'Foundations',
+      source: ProgramSource.preset,
+      days: [
+        ProgramDay(
+          label: 'Full Body',
+          exercises: [
+            ProgramExercise(
+              exerciseId: 'push_up',
+              name: 'Push-up',
+              targetSets: 3,
+              targetReps: 8,
+            ),
+          ],
+        ),
+      ],
+    );
+    // One genuine user program + one that clashes with a preset id (must dedupe).
+    await userPrograms.saveProgram(
+      'u1',
+      foundations.copyWith(id: 'gen_1', name: 'My Plan'),
+    );
+    await userPrograms.saveProgram('u1', foundations.copyWith(name: 'Dup'));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          userRepositoryProvider.overrideWithValue(users),
+          userProgramRepositoryProvider.overrideWithValue(userPrograms),
+          presetProgramsProvider.overrideWith((ref) => [foundations]),
+        ],
+        child: const MaterialApp(home: ProgramsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your programs'), findsOneWidget);
+    expect(find.text('My Plan'), findsOneWidget); // genuine user program
+    // The preset-id clash ('foundations') is deduped → exactly one Foundations.
+    expect(find.text('Foundations'), findsOneWidget);
+    expect(find.text('Dup'), findsNothing);
   });
 }

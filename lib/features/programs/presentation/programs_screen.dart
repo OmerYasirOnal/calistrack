@@ -33,7 +33,8 @@ class ProgramsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Programs')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
+        // root navigator → the form is a full-screen modal over the tab bar.
+        onPressed: () => Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute<void>(builder: (_) => const AiGenerationScreen()),
         ),
         icon: const Icon(Icons.auto_awesome),
@@ -44,30 +45,36 @@ class ProgramsScreen extends ConsumerWidget {
         error: (_, __) => _ProgramsError(
           onRetry: () => ref.invalidate(presetProgramsProvider),
         ),
-        data: (programs) => ListView(
-          padding: const EdgeInsets.fromLTRB(
-            Spacing.md,
-            Spacing.md,
-            Spacing.md,
-            // leave room for the FAB
-            Spacing.xl * 2,
-          ),
-          children: [
-            if (userPrograms.isNotEmpty) ...[
-              const _SectionLabel('Your programs'),
-              for (final p in userPrograms) ...[
-                card(p),
-                const SizedBox(height: Spacing.md),
+        data: (programs) {
+          // A user program never shadows a preset of the same id (the active
+          // resolver prefers presets), so drop dupes to avoid a double card.
+          final presetIds = programs.map((p) => p.id).toSet();
+          final userOnly =
+              userPrograms.where((p) => !presetIds.contains(p.id)).toList();
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.md,
+              Spacing.md,
+              Spacing.md,
+              Spacing.xl * 2, // room for the FAB
+            ),
+            children: [
+              if (userOnly.isNotEmpty) ...[
+                const _SectionLabel('Your programs'),
+                for (final p in userOnly) ...[
+                  card(p),
+                  const SizedBox(height: Spacing.md),
+                ],
+                const SizedBox(height: Spacing.sm),
+                const _SectionLabel('Presets'),
               ],
-              const SizedBox(height: Spacing.sm),
-              const _SectionLabel('Presets'),
+              for (var i = 0; i < programs.length; i++) ...[
+                card(programs[i]),
+                if (i < programs.length - 1) const SizedBox(height: Spacing.md),
+              ],
             ],
-            for (var i = 0; i < programs.length; i++) ...[
-              card(programs[i]),
-              if (i < programs.length - 1) const SizedBox(height: Spacing.md),
-            ],
-          ],
-        ),
+          );
+        },
       ),
     );
   }

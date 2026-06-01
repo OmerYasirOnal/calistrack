@@ -104,4 +104,35 @@ void main() {
     expect(userPrograms.saved, hasLength(1));
     expect(users.store['u1']?.activeProgramId, userPrograms.saved.single.id);
   });
+
+  testWidgets('shows the fallback banner when the function is unavailable',
+      (tester) async {
+    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final auth = FakeAuthRepository(initialUser: me);
+    addTearDown(auth.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          userRepositoryProvider.overrideWithValue(FakeUserRepository()),
+          userProgramRepositoryProvider
+              .overrideWithValue(FakeUserProgramRepository()),
+          exerciseLibraryProvider.overrideWith((ref) => _library),
+          presetProgramsProvider.overrideWith((ref) => _presets),
+          // a caller that always throws → forces the local fallback
+          aiProgramServiceProvider.overrideWithValue(
+            AiProgramService(caller: (_) async => throw Exception('down')),
+          ),
+        ],
+        child: const MaterialApp(home: AiGenerationScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Generate'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('template'), findsOneWidget); // fallback banner
+    expect(find.text('Save & set active'), findsOneWidget);
+  });
 }

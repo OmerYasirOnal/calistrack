@@ -18,7 +18,8 @@ Future<void> main() async {
     );
     // Offline-first: Firestore's local cache serves reads and queues writes
     // when offline (a separate Hive mirror would be redundant for this data —
-    // see docs/specs/2026-06-02-m6-polish-design.md). Set generously + on.
+    // see docs/specs/2026-06-02-m6-polish-design.md). Mobile semantics (the app
+    // targets iOS/Android); web uses a different persistence mechanism.
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,

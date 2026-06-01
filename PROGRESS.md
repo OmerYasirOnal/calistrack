@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M4 T16 Progress screen + fl_chart [branch feat/calistrack-m4-t16-progress-screen]
+- **Task:** turn aggregated history into a visual Progress tab.
+- **Added:** `features/progress/presentation/progress_screen.dart` — overall
+  stats card (streak / this-week / workouts / volume), a history-only exercise
+  picker (ChoiceChips), and a **type-aware fl_chart line chart**
+  (volume / best-hold / distance / sets) with empty + "<2 points" states.
+  Replaces the placeholder (router unchanged — same class).
+- **Preview:** `lib/preview.dart` seeded with 3 prior Push sessions so charts +
+  the "last time" reference both render.
+- **Tests:** empty state + chart renders (stats card, picker name, metric label,
+  `LineChart`) for an exercise with history.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 50/50 pass.
+
 ## 2026-06-02 — M4 T15 Progress repository [branch feat/calistrack-m4-t15-progress-repo]
 - **Task:** aggregate logged workouts into progress insight.
 - **Added:** `features/progress/data/progress_repository.dart` — pure

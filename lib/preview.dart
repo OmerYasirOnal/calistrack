@@ -27,30 +27,42 @@ const _demoUser = AppUser(
   activeProgramId: 'classic_ppl',
 );
 
-// A prior Push session so the "last time" reference renders.
+LoggedExercise _pushUp(int a, int b, int c) => LoggedExercise(
+      exerciseId: 'push_up',
+      name: 'Push-up',
+      sets: [LoggedSet(reps: a), LoggedSet(reps: b), LoggedSet(reps: c)],
+    );
+
+LoggedExercise _dip(int reps, double kg) => LoggedExercise(
+      exerciseId: 'dip',
+      name: 'Dip',
+      sets: [
+        LoggedSet(reps: reps, addedWeightKg: kg),
+        LoggedSet(reps: reps - 1, addedWeightKg: kg),
+      ],
+    );
+
+Workout _seedPush(
+  String id,
+  DateTime date,
+  LoggedExercise pushUp,
+  LoggedExercise dip,
+) =>
+    Workout(
+      id: id,
+      date: date,
+      programId: 'classic_ppl',
+      dayLabel: 'Push',
+      completed: true,
+      exercises: [pushUp, dip],
+    );
+
+// A few prior Push sessions so the "last time" reference + progress charts both
+// have real data in the preview.
 final _seedHistory = <Workout>[
-  Workout(
-    id: 'seed_push',
-    date: DateTime(2026, 5, 30),
-    programId: 'classic_ppl',
-    dayLabel: 'Push',
-    completed: true,
-    exercises: const [
-      LoggedExercise(
-        exerciseId: 'push_up',
-        name: 'Push-up',
-        sets: [LoggedSet(reps: 12), LoggedSet(reps: 11), LoggedSet(reps: 10)],
-      ),
-      LoggedExercise(
-        exerciseId: 'dip',
-        name: 'Dip',
-        sets: [
-          LoggedSet(reps: 8, addedWeightKg: 10),
-          LoggedSet(reps: 7, addedWeightKg: 10),
-        ],
-      ),
-    ],
-  ),
+  _seedPush('seed_1', DateTime(2026, 5, 24), _pushUp(10, 9, 8), _dip(6, 5)),
+  _seedPush('seed_2', DateTime(2026, 5, 27), _pushUp(11, 10, 9), _dip(7, 7.5)),
+  _seedPush('seed_3', DateTime(2026, 5, 30), _pushUp(12, 11, 10), _dip(8, 10)),
 ];
 
 class _PreviewAuth implements AuthRepository {

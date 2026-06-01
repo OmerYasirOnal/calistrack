@@ -4,6 +4,20 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M4 T18 Skills screen [branch feat/calistrack-m4-t18-skills-screen]
+- **Task:** browse skill progressions, log step attempts, advance the ladder.
+- **Added:** `features/skills/presentation/skills_screen.dart` (list with
+  completion bars + next step, replaces placeholder), `skill_detail_screen.dart`
+  (step ladder done/current/locked, keyed per-step logger for reps/hold,
+  mark-complete + step-back), `application/skill_providers.dart`
+  (`SkillController` log/setStep). Router: nested `/skills/:skillId`. Preview
+  extended with an in-memory `_PreviewSkills` (seeded Front Lever 25% / Pistol
+  50%) so the tab renders without Firebase.
+- **Tests:** list renders both skills; detail opens → logs an attempt
+  (logCalls + saved logs) → advances the step (setStepCalls + index).
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 58/58 pass
+  · Progress + Skills screenshotted from the preview.
+
 ## 2026-06-02 — M4 T17 Skill trees + SkillRepository [branch feat/calistrack-m4-t17-skills-repo]
 - **Task:** preset skill progressions + a repo that merges them with saved progress.
 - **Added:** `assets/data/skills.json` — 5 trees (Muscle-up / Front Lever /

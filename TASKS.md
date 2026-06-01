@@ -46,7 +46,7 @@ Each task links to its GitHub issue once created.
 | T15 | Progress repository | REVIEW | #4 | — |
 | T16 | Progress charts (fl_chart) | REVIEW | #4 | — |
 | T17 | Skill model + preset trees | REVIEW | #4 | — |
-| T18 | Skills screen | TODO | — | — |
+| T18 | Skills screen | REVIEW | #4 | — |
 
 ## M5 — AI generation
 | Task | Title | Status | Issue | PR |

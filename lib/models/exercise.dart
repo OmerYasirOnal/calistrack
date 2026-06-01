@@ -8,8 +8,7 @@ enum ExerciseType {
   distance, // running / cardio measured in meters
   time; // timed effort measured in seconds (e.g. timed run)
 
-  static ExerciseType fromName(String? name) =>
-      ExerciseType.values.firstWhere(
+  static ExerciseType fromName(String? name) => ExerciseType.values.firstWhere(
         (e) => e.name == name,
         orElse: () => ExerciseType.reps,
       );

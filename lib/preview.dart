@@ -7,17 +7,23 @@
 //
 // Production uses lib/main.dart; nothing here ships in the real app.
 
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/profile/data/user_repository.dart';
 import 'features/programs/application/program_providers.dart';
+import 'features/skills/data/skill_repository.dart';
 import 'features/workout/application/workout_session.dart';
 import 'features/workout/data/workout_repository.dart';
 import 'models/app_user.dart';
+import 'models/skill_progress.dart';
 import 'models/workout.dart';
 
 const _demoUser = AppUser(
@@ -115,6 +121,63 @@ class _PreviewUsers implements UserRepository {
   }
 }
 
+// Some skill progress so the Skills tab shows partial completion.
+final _flLog = SkillLog(
+  date: DateTime(2026, 5, 30),
+  stepId: 'tuck_fl',
+  holdSeconds: 18,
+);
+final _psLog = SkillLog(
+  date: DateTime(2026, 5, 28),
+  stepId: 'box_pistol',
+  reps: 6,
+);
+final Map<String, SavedSkill> _seedSkills = {
+  'front_lever': (currentStepIndex: 1, logs: [_flLog]),
+  'pistol_squat': (currentStepIndex: 2, logs: [_psLog]),
+};
+
+class _PreviewSkills implements SkillRepository {
+  final Map<String, SavedSkill> _saved = {..._seedSkills};
+  final StreamController<List<SkillProgress>> _controller =
+      StreamController<List<SkillProgress>>.broadcast();
+  List<SkillProgress>? _presets;
+
+  @override
+  Future<List<SkillProgress>> presets() async {
+    final cached = _presets;
+    if (cached != null) return cached;
+    final raw = await rootBundle.loadString('assets/data/skills.json');
+    return _presets = (json.decode(raw) as List<dynamic>)
+        .map((s) => SkillProgress.fromJson(s as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> _emit() async =>
+      _controller.add(mergeSkills(await presets(), _saved));
+
+  @override
+  Stream<List<SkillProgress>> watch(String uid) async* {
+    yield mergeSkills(await presets(), _saved);
+    yield* _controller.stream;
+  }
+
+  @override
+  Future<void> logAttempt(String uid, String skillId, SkillLog log) async {
+    final cur = _saved[skillId] ?? (currentStepIndex: 0, logs: <SkillLog>[]);
+    _saved[skillId] =
+        (currentStepIndex: cur.currentStepIndex, logs: [...cur.logs, log]);
+    await _emit();
+  }
+
+  @override
+  Future<void> setStep(String uid, String skillId, int currentStepIndex) async {
+    final cur = _saved[skillId] ?? (currentStepIndex: 0, logs: <SkillLog>[]);
+    _saved[skillId] = (currentStepIndex: currentStepIndex, logs: cur.logs);
+    await _emit();
+  }
+}
+
 class _PreviewWorkouts implements WorkoutRepository {
   final List<Workout> _saved = [..._seedHistory];
 
@@ -145,6 +208,7 @@ void main() {
       authRepositoryProvider.overrideWithValue(_PreviewAuth()),
       userRepositoryProvider.overrideWithValue(_PreviewUsers()),
       workoutRepositoryProvider.overrideWithValue(_PreviewWorkouts()),
+      skillRepositoryProvider.overrideWithValue(_PreviewSkills()),
     ],
   );
   runApp(

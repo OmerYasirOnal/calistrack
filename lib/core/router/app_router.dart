@@ -10,6 +10,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/programs/presentation/program_detail_screen.dart';
 import '../../features/programs/presentation/programs_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
+import '../../features/skills/presentation/skill_detail_screen.dart';
 import '../../features/skills/presentation/skills_screen.dart';
 import '../../features/today/presentation/today_screen.dart';
 import '../../models/app_user.dart';
@@ -26,6 +27,9 @@ abstract final class Routes {
 
   /// Detail route for a single program, e.g. `/programs/classic_ppl`.
   static String programDetail(String programId) => '$programs/$programId';
+
+  /// Detail route for a single skill, e.g. `/skills/muscle_up`.
+  static String skillDetail(String skillId) => '$skills/$skillId';
 }
 
 final _rootKey = GlobalKey<NavigatorState>();
@@ -112,6 +116,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.skills,
                 builder: (context, state) => const SkillsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':skillId',
+                    builder: (context, state) => SkillDetailScreen(
+                      skillId: state.pathParameters['skillId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -4,6 +4,20 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M5 T20 AI client service + persist + fallback [branch feat/calistrack-m5-t20-ai-client]
+- **Task:** the client side of AI generation — call the function, parse, persist,
+  and a fallback so it works without deploy.
+- **Added:** `programs/application/ai_program_service.dart` — `GenerationRequest`,
+  `AiProgramService.generate` (injectable Cloud Function caller; parses the
+  response resolving movement names from the library + dropping unknown ids;
+  `usedFallback` flag), pure `fallbackProgram` (preset matching daysPerWeek →
+  Foundations, renamed). `programs/data/user_program_repository.dart`
+  (`saveProgram` + `watch` `users/{uid}/programs`, `userProgramsProvider`).
+  **activeProgramProvider now resolves presets + user programs.** Fakes added.
+- **Tests:** fallback mapping (days-match / no-match), generate (valid parse +
+  name resolve + unknown-id drop), error→fallback, empty-days→fallback. 65/65 pass.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 65/65 pass.
+
 ## 2026-06-02 — M5 T19 generateProgram Cloud Function [branch feat/calistrack-m5-t19-generate-function]
 - **Task:** server-side AI program generation (OpenAI), deploy-ready.
 - **Added:** `functions/` (TS) — `generateProgram` onCall: validates the request,

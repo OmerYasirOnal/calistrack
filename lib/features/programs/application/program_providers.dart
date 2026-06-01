@@ -8,17 +8,21 @@ import '../../auth/data/auth_repository.dart';
 import '../../profile/application/profile_providers.dart';
 import '../../profile/data/user_repository.dart';
 import '../data/program_repository.dart';
+import '../data/user_program_repository.dart';
 
-/// The user's active program, resolved from the presets, or null if none set.
-/// Awaits the profile (rather than reading a still-loading snapshot) so the UI
-/// never flashes "no program" before the profile arrives.
-/// (M5 will also resolve AI/custom programs from `users/{uid}/programs`.)
+/// The user's active program, resolved from the presets OR their own saved
+/// (AI/custom) programs, or null if none set. Awaits the profile so a preset
+/// active program never flashes "no program"; user programs are read from the
+/// current (possibly still-loading) snapshot and resolve on their next emit —
+/// and crucially this never errors when the user-programs stream is unavailable
+/// (e.g. no Firebase in tests). A preset wins over a user program of the same id.
 final activeProgramProvider = FutureProvider<Program?>((ref) async {
   final profile = await ref.watch(currentUserProfileProvider.future);
   final id = profile?.activeProgramId;
   if (id == null) return null;
   final presets = await ref.watch(presetProgramsProvider.future);
-  return presets.firstWhereOrNull((p) => p.id == id);
+  final userPrograms = ref.watch(userProgramsProvider).valueOrNull ?? const [];
+  return [...presets, ...userPrograms].firstWhereOrNull((p) => p.id == id);
 });
 
 /// Drives the "set as active program" action and exposes its async state for

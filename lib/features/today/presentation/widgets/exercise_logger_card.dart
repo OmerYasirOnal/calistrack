@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../models/program.dart';
 import '../../../../models/workout.dart';
+import '../../../exercises/data/exercise_repository.dart';
 import '../../../programs/presentation/program_format.dart';
 import '../../../workout/application/workout_session.dart';
 
@@ -89,6 +90,9 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
             .watch(lastSetsForProvider(widget.exercise.exerciseId))
             .valueOrNull ??
         const [];
+    final cue = ref
+        .watch(exerciseCuesProvider)
+        .valueOrNull?[widget.exercise.exerciseId];
 
     // Seed inputs from last session once it resolves (before any user edits).
     if (!_seeded && lastSets.isNotEmpty) {
@@ -127,6 +131,19 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
               'Target ${targetSummary(widget.exercise)}',
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
+            if (cue != null && cue.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: Spacing.xs),
+                child: Text(
+                  cue,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
             if (lastSets.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: Spacing.xs),

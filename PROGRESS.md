@@ -4,6 +4,17 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M10 T37 Coaching cues on the logging card [branch feat/calistrack-m10-t37-logger-cues]
+- **Task:** the verification re-audit flagged a blocker — the first-set logging
+  surface (ExerciseLoggerCard) showed no form cue (I had deferred it in T28 for
+  test-fragility). Fixed properly.
+- **Added:** the card now watches `exerciseCuesProvider` and renders the cue
+  (compact, italic, max 2 lines) under the target; the taller cards made two
+  layout-sensitive Today tests fragile, so made them scroll-robust
+  (scrollUntilVisible Plank, ensureVisible the log/Skip buttons) + assert the cue.
+  101 pass, 82.0%% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 101/101 pass.
+
 ## 2026-06-02 — M9 T36 Profile editing [branch feat/calistrack-m9-t36-profile-editing]
 - **Task:** the Profile screen stubbed editing and showed the auth identity's
   level (always Beginner) rather than the saved profile.

@@ -9,6 +9,7 @@ import 'package:calistrack/features/workout/data/workout_repository.dart';
 import 'package:calistrack/models/exercise.dart';
 import 'package:calistrack/models/program.dart';
 import 'package:calistrack/models/workout.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -92,9 +93,13 @@ void main() {
     await tester.tap(find.text('Push'));
     await tester.pumpAndSettle();
     expect(find.text('Push-up'), findsOneWidget);
+    // The coaching cue is surfaced on the logging card itself.
+    expect(find.textContaining('Hands under shoulders'), findsOneWidget);
     expect(find.text('0/11 sets'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Log set').first);
+    final logBtn = find.byTooltip('Log set').first;
+    await tester.ensureVisible(logBtn);
+    await tester.tap(logBtn);
     await tester.pumpAndSettle();
     expect(find.text('1/11 sets'), findsOneWidget);
 
@@ -161,11 +166,14 @@ void main() {
     await tester.tap(find.text('Push'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Log set').first);
+    final logBtn = find.byTooltip('Log set').first;
+    await tester.ensureVisible(logBtn);
+    await tester.tap(logBtn);
     await tester.pump(); // show the rest timer (don't settle the countdown)
     expect(find.text('Skip'), findsOneWidget);
     expect(find.textContaining('Rest'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Skip'));
     await tester.tap(find.text('Skip'));
     await tester.pump();
     expect(find.text('Skip'), findsNothing); // back to the input row
@@ -194,8 +202,14 @@ void main() {
     await tester.tap(find.text('Core'));
     await tester.pumpAndSettle();
 
-    // Plank is a hold movement. Target its log button via its card (scroll-
-    // proof — index-based finders shift as the lazy ListView builds/disposes).
+    // Plank is a hold movement. Scroll it into view (taller cards with cues
+    // push it down the lazy ListView), then target its log button via its card.
+    await tester.scrollUntilVisible(
+      find.text('Plank'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Plank'), findsOneWidget);
     expect(find.text('sec'), findsWidgets);
     final plankCard = find.ancestor(

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'features/ads/application/ad_service.dart';
+import 'features/notifications/application/notification_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -36,6 +37,14 @@ Future<void> main() async {
     await container.read(adServiceProvider).initialize();
   } catch (e) {
     debugPrint('Ads init skipped/failed: $e');
+  }
+  // Best-effort notifications init (plugin + timezone). Scheduled reminders
+  // persist in the OS across launches; this just readies the plugin. No-op on
+  // web/desktop/tests, mobile-only otherwise.
+  try {
+    await container.read(notificationServiceProvider).initialize();
+  } catch (e) {
+    debugPrint('Notifications init skipped/failed: $e');
   }
 
   runApp(

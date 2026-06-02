@@ -185,6 +185,19 @@ class _PreviewUsers implements UserRepository {
       onboardingCompletedAt: base.onboardingCompletedAt,
     );
   }
+
+  @override
+  Future<void> setReminder(
+    String uid, {
+    required bool enabled,
+    int? minutes,
+  }) async {
+    final base = _store[uid] ?? _demoUser;
+    _store[uid] = base.copyWith(
+      reminderEnabled: enabled,
+      reminderMinutes: minutes,
+    );
+  }
 }
 
 // Some skill progress so the Skills tab shows partial completion.

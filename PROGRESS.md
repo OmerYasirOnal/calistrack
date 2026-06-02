@@ -4,6 +4,36 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M11 T39 Workout reminders (local notifications) [branch feat/calistrack-m11-t39-reminders]
+- **Task:** opt-in daily reminder so users actually come back — retention is the
+  point of a tracker. Device-scheduled, no server.
+- **Added:**
+  - `AppUser.reminderEnabled` (bool, default off) + `reminderMinutes` (int?,
+    minutes past midnight) — model + fromJson/toJson (enabled always serialized,
+    minutes omitted when null) + copyWith.
+  - `UserRepository.setReminder(uid, enabled:, minutes:)` — targeted Firestore
+    merge; fake + preview impls.
+  - `NotificationService` web-safe abstraction (conditional import: web/test get
+    a `NoOpNotificationService`, mobile/desktop get `LocalNotificationService`
+    via flutter_local_notifications + timezone + flutter_timezone). Guarded by
+    `Platform.isAndroid || isIOS` so the test VM no-ops without an override.
+    `applyReminder` cancels-then-(re)schedules a single daily notification
+    (`zonedSchedule` + `DateTimeComponents.time`, inexact alarm), requests the OS
+    permission at opt-in, and resolves the device IANA zone so it fires at the
+    right wall-clock time. Pure helpers `nextReminderInstance` /
+    `reminderTimeOfDay` / `defaultReminderMinutes` (18:00) are unit-tested.
+  - Profile reminder card: a switch + tap-to-pick time, driven by the persisted
+    profile (source of truth); persists + best-effort schedules on change.
+  - `main.dart` best-effort `initialize()`; AndroidManifest POST_NOTIFICATIONS +
+    RECEIVE_BOOT_COMPLETED + the scheduled/boot receivers (re-arm after reboot).
+  - Refactored the fake UserRepository to a JSON-merge helper so targeted merges
+    faithfully preserve untouched fields (fixed a latent drop-bug where
+    setActiveProgram/updateDetails would have wiped the new reminder fields).
+- **Owner still:** verify on-device delivery (the permission prompt + the
+  reminder actually firing) on iOS + Android.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 112 pass ·
+  80.9% line coverage (≥75% gate).
+
 ## 2026-06-02 — 🎯 Launch runbook + privacy-policy draft [branch docs/calistrack-launch-runbook]
 - **Task:** capture the remaining OWNER-ONLY launch steps so the handoff is complete.
 - **Added:** `LAUNCH.md` (ordered owner runbook: flutterfire configure · deploy the

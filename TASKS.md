@@ -94,6 +94,11 @@ Each task links to its GitHub issue once created.
 | T37 | Coaching cues on the logging card (+ scroll-robust Today tests) | DONE | #35 | #36 |
 | T38 | GDPR/UMP consent + iOS ATT in ad init | DONE | #35 | — |
 
+## M11 — Workout reminders  🚧 (issue #39)
+| Task | Title | Status | Issue | PR |
+|------|-------|--------|-------|----|
+| T39 | Opt-in daily local-notification reminder (toggle + time in Profile) | DONE | #39 | #40 |
+
 ---
 
 **MVP code-complete (2026-06-01): M1–M6 all merged to `main`, CI green (80.1% line coverage, 75% gate).**

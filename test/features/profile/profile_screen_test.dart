@@ -1,4 +1,5 @@
 import 'package:calistrack/features/auth/data/auth_repository.dart';
+import 'package:calistrack/features/notifications/application/notification_service.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/profile/presentation/profile_screen.dart';
 import 'package:calistrack/models/app_user.dart';
@@ -131,5 +132,80 @@ void main() {
     expect(users.store['u1']!.level, ExperienceLevel.intermediate);
     // Returned to Profile with the new name shown.
     expect(find.text('New Name'), findsOneWidget);
+  });
+
+  testWidgets('enabling the daily reminder persists with the default time',
+      (tester) async {
+    final users = FakeUserRepository()
+      ..store['u1'] = const AppUser(uid: 'u1', email: 'a@b.com');
+    await _pump(
+      tester,
+      FakeAuthRepository(
+        initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+      ),
+      users: users,
+    );
+
+    expect(find.text('Daily reminder'), findsOneWidget);
+    // Off → no time row yet.
+    expect(find.text('Reminder time'), findsNothing);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+
+    expect(users.setReminderCalls, 1);
+    expect(users.store['u1']!.reminderEnabled, isTrue);
+    expect(users.store['u1']!.reminderMinutes, defaultReminderMinutes);
+    // The time row now shows the default 6:00 PM.
+    expect(find.text('Reminder time'), findsOneWidget);
+    expect(find.text('6:00 PM'), findsOneWidget);
+  });
+
+  testWidgets('disabling the reminder keeps the chosen time for next time',
+      (tester) async {
+    final users = FakeUserRepository()
+      ..store['u1'] = const AppUser(
+        uid: 'u1',
+        email: 'a@b.com',
+        reminderEnabled: true,
+        reminderMinutes: 8 * 60, // 08:00
+      );
+    await _pump(
+      tester,
+      FakeAuthRepository(
+        initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+      ),
+      users: users,
+    );
+
+    expect(find.text('8:00 AM'), findsOneWidget);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+
+    expect(users.store['u1']!.reminderEnabled, isFalse);
+    // Time preserved so re-enabling restores it.
+    expect(users.store['u1']!.reminderMinutes, 8 * 60);
+    expect(find.text('Reminder time'), findsNothing);
+  });
+
+  test('a targeted merge (setActiveProgram) preserves the reminder fields', () {
+    final users = FakeUserRepository()
+      ..store['u1'] = const AppUser(
+        uid: 'u1',
+        email: 'a@b.com',
+        reminderEnabled: true,
+        reminderMinutes: 9 * 60,
+      );
+    addTearDown(users.dispose);
+
+    users.setActiveProgram('u1', 'ppl');
+
+    // setActiveProgram only writes activeProgramId; the reminder (and every
+    // other field) must survive the merge.
+    final after = users.store['u1']!;
+    expect(after.activeProgramId, 'ppl');
+    expect(after.reminderEnabled, isTrue);
+    expect(after.reminderMinutes, 9 * 60);
   });
 }

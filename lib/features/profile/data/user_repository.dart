@@ -44,6 +44,14 @@ abstract interface class UserRepository {
     double? heightCm,
     double? weightKg,
   });
+
+  /// Persists the daily-reminder preference (on/off + time-of-day in minutes)
+  /// as a targeted merge.
+  Future<void> setReminder(
+    String uid, {
+    required bool enabled,
+    int? minutes,
+  });
 }
 
 class FirestoreUserRepository implements UserRepository {
@@ -123,6 +131,17 @@ class FirestoreUserRepository implements UserRepository {
           'heightCm': heightCm,
           'weightKg': weightKg,
         },
+        SetOptions(merge: true),
+      );
+
+  @override
+  Future<void> setReminder(
+    String uid, {
+    required bool enabled,
+    int? minutes,
+  }) =>
+      _doc(uid).set(
+        {'reminderEnabled': enabled, 'reminderMinutes': minutes},
         SetOptions(merge: true),
       );
 }

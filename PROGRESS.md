@@ -4,6 +4,19 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M10 T38 Ad consent (GDPR/UMP + iOS ATT) [branch feat/calistrack-m10-t38-ad-consent]
+- **Task:** the re-audit flagged the consent/ATT TODO stubs as gating ad legality.
+- **Added:** MobileAdService.initialize now (1) requests iOS App Tracking
+  Transparency (app_tracking_transparency plugin; only when notDetermined), (2)
+  gathers GDPR/UMP consent via the Google User Messaging Platform APIs bundled in
+  google_mobile_ads (requestConsentInfoUpdate → loadAndShowConsentFormIfRequired,
+  time-boxed 10s so startup never hangs, proceeds non-personalized on failure),
+  then (3) initializes the ads SDK. All inside the dart:io path → the conditional
+  import keeps it out of web/tests (verified `flutter build web` still compiles).
+- **Owner still:** configure the UMP consent form in the AdMob console + verify
+  the ATT/consent prompts on a real device.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 101 pass · web build green.
+
 ## 2026-06-02 — M10 T37 Coaching cues on the logging card [branch feat/calistrack-m10-t37-logger-cues]
 - **Task:** the verification re-audit flagged a blocker — the first-set logging
   surface (ExerciseLoggerCard) showed no form cue (I had deferred it in T28 for

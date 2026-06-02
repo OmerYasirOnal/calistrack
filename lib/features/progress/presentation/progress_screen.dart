@@ -176,6 +176,8 @@ class _EmptyProgress extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.lg),
           FilledButton.icon(
+            // .go (not .push): Today and Progress are separate shell branches,
+            // so this switches tabs while keeping each branch's own stack.
             onPressed: () => context.go(Routes.today),
             icon: const Icon(Icons.play_arrow),
             label: const Text('Log your first workout'),

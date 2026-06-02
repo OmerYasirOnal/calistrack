@@ -33,6 +33,7 @@ class SkillsScreen extends ConsumerWidget {
               ],
               for (final skill in list) ...[
                 _SkillCard(
+                  key: ValueKey(skill.id),
                   skill: skill,
                   onTap: () => context.push(Routes.skillDetail(skill.id)),
                 ),
@@ -77,7 +78,7 @@ class _SkillsIntro extends StatelessWidget {
 }
 
 class _SkillCard extends StatelessWidget {
-  const _SkillCard({required this.skill, required this.onTap});
+  const _SkillCard({required this.skill, required this.onTap, super.key});
 
   final SkillProgress skill;
   final VoidCallback onTap;

@@ -62,6 +62,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (!user.emailVerified) ...[
+                const SizedBox(height: Spacing.md),
+                const _VerifyEmailCard(),
+              ],
               const SizedBox(height: Spacing.lg),
               OutlinedButton.icon(
                 onPressed: signingOut
@@ -73,6 +77,84 @@ class ProfileScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Shown on Profile while the account's email is unverified — lets the user
+/// resend the verification link. Manages its own send state.
+class _VerifyEmailCard extends ConsumerStatefulWidget {
+  const _VerifyEmailCard();
+
+  @override
+  ConsumerState<_VerifyEmailCard> createState() => _VerifyEmailCardState();
+}
+
+class _VerifyEmailCardState extends ConsumerState<_VerifyEmailCard> {
+  bool _sending = false;
+
+  Future<void> _resend() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _sending = true);
+    try {
+      await ref.read(authRepositoryProvider).sendEmailVerification();
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Verification email sent.')),
+        );
+    } catch (_) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Could not send the email.')),
+        );
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Card(
+      color: scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.mark_email_unread_outlined, color: scheme.primary),
+                const SizedBox(width: Spacing.sm),
+                Expanded(
+                  child: Text('Verify your email', style: text.titleSmall),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.xs),
+            Text(
+              'We sent a verification link to your inbox. Didn’t get it?',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: Spacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: _sending ? null : _resend,
+                child: _sending
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Resend verification email'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -78,8 +78,8 @@ Each task links to its GitHub issue once created.
 ## M8 — Account recovery + launch polish  🚧 (issue #28)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T32 | "Forgot password?" + reset dialog (sendPasswordResetEmail) | REVIEW | #28 | — |
-| T33 | Email verification (send on register + banner + resend) | TODO | #28 | — |
+| T32 | "Forgot password?" + reset dialog (sendPasswordResetEmail) | DONE | #28 | #29 |
+| T33 | Email verification (send on register + Profile resend) | REVIEW | #28 | — |
 | T34 | Branded splash (logo + name) | TODO | #28 | — |
 | T35 | Guest / "try without an account" (optional) | TODO | #28 | — |
 

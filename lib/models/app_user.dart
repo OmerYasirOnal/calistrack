@@ -28,6 +28,7 @@ class AppUser {
     this.goals = const [],
     this.activeProgramId,
     this.onboardingCompletedAt,
+    this.emailVerified = true,
   });
 
   final String uid;
@@ -38,6 +39,12 @@ class AppUser {
   final ExperienceLevel level;
   final List<String> goals;
   final String? activeProgramId;
+
+  /// Whether the auth provider considers the email verified. Sourced from the
+  /// auth *identity* ([mapFirebaseUser]); the Firestore profile doesn't persist
+  /// it, so profile-derived users default to true (they aren't used to gate the
+  /// verify-email prompt — only the identity from [authStateProvider] is).
+  final bool emailVerified;
 
   /// When the one-time first-run onboarding was finished. Null means the user
   /// has not completed onboarding yet — this is what the router's `/onboarding`
@@ -82,6 +89,7 @@ class AppUser {
     List<String>? goals,
     String? activeProgramId,
     DateTime? onboardingCompletedAt,
+    bool? emailVerified,
   }) =>
       AppUser(
         uid: uid,
@@ -94,5 +102,6 @@ class AppUser {
         activeProgramId: activeProgramId ?? this.activeProgramId,
         onboardingCompletedAt:
             onboardingCompletedAt ?? this.onboardingCompletedAt,
+        emailVerified: emailVerified ?? this.emailVerified,
       );
 }

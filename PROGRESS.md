@@ -4,6 +4,18 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M8 T33 Email verification [branch feat/calistrack-m8-t33-email-verification]
+- **Task:** verify emails (audit major) — send on sign-up + let users resend.
+- **Added:** `AuthRepository.sendEmailVerification` (Firebase impl guards on
+  already-verified); `AuthController.registerWithEmail` now sends it best-effort
+  after bootstrap (a failed verification email never fails registration);
+  `AppUser.emailVerified` sourced from the auth identity (`mapFirebaseUser`),
+  defaults true for profile-derived users; Profile shows a "Verify your email"
+  card with a Resend button only when unverified.
+- **Tests:** register sends verification; Profile resend (unverified) + no card
+  when verified. 95 pass, 82.0%% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 95/95 pass.
+
 ## 2026-06-02 — M8 T32 "Forgot password?" [branch feat/calistrack-m8-t32-forgot-password]
 - **Task:** remove the permanent-lockout landmine (audit major) — a password reset path.
 - **Added:** `AuthRepository.sendPasswordResetEmail`; a "Forgot password?" link on

@@ -48,6 +48,7 @@ class FakeAuthRepository implements AuthRepository {
   int signOutCalls = 0;
   int resetCalls = 0;
   String? lastResetEmail;
+  int verifyCalls = 0;
 
   void dispose() => _controller.close();
 
@@ -98,6 +99,12 @@ class FakeAuthRepository implements AuthRepository {
   Future<void> sendPasswordResetEmail(String email) async {
     resetCalls++;
     lastResetEmail = email;
+    if (errorToThrow != null) throw errorToThrow!;
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    verifyCalls++;
     if (errorToThrow != null) throw errorToThrow!;
   }
 

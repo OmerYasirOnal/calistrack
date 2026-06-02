@@ -6,7 +6,6 @@ import 'package:calistrack/features/programs/data/program_repository.dart';
 import 'package:calistrack/features/today/presentation/widgets/exercise_logger_card.dart';
 import 'package:calistrack/features/workout/data/training_defaults.dart';
 import 'package:calistrack/features/workout/data/workout_repository.dart';
-import 'package:calistrack/models/app_user.dart';
 import 'package:calistrack/models/exercise.dart';
 import 'package:calistrack/models/program.dart';
 import 'package:calistrack/models/workout.dart';
@@ -50,7 +49,7 @@ void main() {
   });
 
   testWidgets('no active program shows the empty state', (tester) async {
-    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final me = onboardedUser();
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     addTearDown(() {
@@ -71,8 +70,7 @@ void main() {
   });
 
   testWidgets('pick a day, log a set, and finish to a summary', (tester) async {
-    const me =
-        AppUser(uid: 'u1', email: 'a@b.com', activeProgramId: 'classic_ppl');
+    final me = onboardedUser(activeProgramId: 'classic_ppl');
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     final workouts = FakeWorkoutRepository();
@@ -111,8 +109,7 @@ void main() {
 
   testWidgets('seeds inputs + last-time reference from history',
       (tester) async {
-    const me =
-        AppUser(uid: 'u1', email: 'a@b.com', activeProgramId: 'classic_ppl');
+    final me = onboardedUser(activeProgramId: 'classic_ppl');
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     final workouts = FakeWorkoutRepository()
@@ -139,8 +136,7 @@ void main() {
 
   testWidgets('rest timer appears after a set and can be skipped',
       (tester) async {
-    const me =
-        AppUser(uid: 'u1', email: 'a@b.com', activeProgramId: 'classic_ppl');
+    final me = onboardedUser(activeProgramId: 'classic_ppl');
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     addTearDown(() {
@@ -174,8 +170,7 @@ void main() {
   });
 
   testWidgets('logs a hold movement in seconds', (tester) async {
-    const me =
-        AppUser(uid: 'u1', email: 'a@b.com', activeProgramId: 'ppl_core');
+    final me = onboardedUser(activeProgramId: 'ppl_core');
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     addTearDown(() {

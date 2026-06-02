@@ -6,6 +6,8 @@ import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
+import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/profile/application/profile_providers.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/programs/presentation/program_detail_screen.dart';
 import '../../features/programs/presentation/programs_screen.dart';
@@ -19,6 +21,7 @@ import '../../models/app_user.dart';
 abstract final class Routes {
   static const login = '/login';
   static const register = '/register';
+  static const onboarding = '/onboarding';
   static const today = '/today';
   static const programs = '/programs';
   static const progress = '/progress';
@@ -35,36 +38,73 @@ abstract final class Routes {
 final _rootKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
 
+/// Pure gating logic for the router's redirect. Extracted so its many branches
+/// (signed-out, onboarding-pending, fully-onboarded, profile-still-loading) can
+/// be unit-tested without spinning up a full navigator.
+///
+/// [auth] is the auth *identity*; [profile] is the Firestore profile document
+/// that carries `onboardingCompletedAt`. Returns the path to redirect to, or
+/// null to stay put.
+@visibleForTesting
+String? authRedirect({
+  required AsyncValue<AppUser?> auth,
+  required AsyncValue<AppUser?> profile,
+  required String location,
+}) {
+  // Don't bounce the user while the auth identity is still resolving.
+  if (auth.isLoading) return null;
+
+  final signedIn = auth.valueOrNull != null;
+  final atAuthRoute = location == Routes.login || location == Routes.register;
+  final atOnboarding = location == Routes.onboarding;
+
+  if (!signedIn) return atAuthRoute ? null : Routes.login;
+
+  // Signed in. The onboarding decision needs the Firestore profile. Until we
+  // actually have it (still loading, errored, or the doc isn't written yet),
+  // neither force onboarding nor trap the user there — just keep them off the
+  // auth screens.
+  final user = profile.valueOrNull;
+  if (user == null) return atAuthRoute ? Routes.today : null;
+
+  if (user.onboardingCompletedAt == null) {
+    return atOnboarding ? null : Routes.onboarding;
+  }
+
+  // Fully onboarded: the auth + onboarding routes are off-limits.
+  if (atAuthRoute || atOnboarding) return Routes.today;
+  return null;
+}
+
 /// The app router, built as a provider so auth-state changes re-run redirects.
 /// A [StatefulShellRoute] hosts the five-tab bottom nav (each tab keeps its own
 /// stack); `/login` + `/register` sit outside the shell.
 final goRouterProvider = Provider<GoRouter>((ref) {
-  // Bridge the auth StreamProvider to a Listenable go_router can refresh on.
-  final authListenable = ValueNotifier<AsyncValue<AppUser?>>(
-    const AsyncValue.loading(),
-  );
-  ref.onDispose(authListenable.dispose);
-  ref.listen<AsyncValue<AppUser?>>(
+  // Bridge the auth identity *and* the profile doc to a Listenable go_router
+  // can refresh on — the onboarding gate keys off the profile, so the router
+  // must re-run its redirect when either changes.
+  final refresh = ValueNotifier<int>(0);
+  ref.onDispose(refresh.dispose);
+  ref.listen(
     authStateProvider,
-    (_, next) => authListenable.value = next,
+    (_, __) => refresh.value++,
+    fireImmediately: true,
+  );
+  ref.listen(
+    currentUserProfileProvider,
+    (_, __) => refresh.value++,
     fireImmediately: true,
   );
 
   return GoRouter(
     navigatorKey: _rootKey,
     initialLocation: Routes.today,
-    refreshListenable: authListenable,
-    redirect: (context, state) {
-      final auth = authListenable.value;
-      // While auth is still resolving, don't bounce the user anywhere.
-      if (auth.isLoading) return null;
-      final signedIn = auth.valueOrNull != null;
-      final loc = state.matchedLocation;
-      final atAuthRoute = loc == Routes.login || loc == Routes.register;
-      if (!signedIn) return atAuthRoute ? null : Routes.login;
-      if (atAuthRoute) return Routes.today;
-      return null;
-    },
+    refreshListenable: refresh,
+    redirect: (context, state) => authRedirect(
+      auth: ref.read(authStateProvider),
+      profile: ref.read(currentUserProfileProvider),
+      location: state.matchedLocation,
+    ),
     routes: [
       GoRoute(
         path: Routes.login,
@@ -73,6 +113,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.register,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: Routes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

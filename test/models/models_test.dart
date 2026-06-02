@@ -177,5 +177,20 @@ void main() {
       expect(decoded.level, ExperienceLevel.intermediate);
       expect(decoded.goals, ['muscle_up', 'front_lever']);
     });
+
+    test('onboardingCompletedAt round-trips as an ISO string, null when unset',
+        () {
+      const fresh = AppUser(uid: 'u1', email: 'a@b.com');
+      expect(fresh.onboardingCompletedAt, isNull);
+      expect(fresh.toJson().containsKey('onboardingCompletedAt'), false);
+
+      final stamped = fresh.copyWith(
+        onboardingCompletedAt: DateTime.utc(2026, 6, 2, 10, 30),
+      );
+      final json = stamped.toJson();
+      expect(json['onboardingCompletedAt'], '2026-06-02T10:30:00.000Z');
+      final decoded = AppUser.fromJson(json);
+      expect(decoded.onboardingCompletedAt, DateTime.utc(2026, 6, 2, 10, 30));
+    });
   });
 }

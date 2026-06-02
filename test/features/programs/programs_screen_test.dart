@@ -5,7 +5,6 @@ import 'package:calistrack/features/programs/data/program_repository.dart';
 import 'package:calistrack/features/programs/data/user_program_repository.dart';
 import 'package:calistrack/features/programs/presentation/program_detail_screen.dart';
 import 'package:calistrack/features/programs/presentation/programs_screen.dart';
-import 'package:calistrack/models/app_user.dart';
 import 'package:calistrack/models/program.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +15,7 @@ import '../../support/fakes.dart';
 void main() {
   testWidgets('lists presets, opens a detail, and sets it active',
       (tester) async {
-    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final me = onboardedUser();
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     addTearDown(() {
@@ -101,7 +100,7 @@ void main() {
 
   testWidgets('shows a "Your programs" section and dedupes preset-id clashes',
       (tester) async {
-    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final me = onboardedUser();
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     final userPrograms = FakeUserProgramRepository();

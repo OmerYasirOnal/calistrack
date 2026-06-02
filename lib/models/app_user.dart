@@ -27,6 +27,7 @@ class AppUser {
     this.level = ExperienceLevel.beginner,
     this.goals = const [],
     this.activeProgramId,
+    this.onboardingCompletedAt,
   });
 
   final String uid;
@@ -37,6 +38,13 @@ class AppUser {
   final ExperienceLevel level;
   final List<String> goals;
   final String? activeProgramId;
+
+  /// When the one-time first-run onboarding was finished. Null means the user
+  /// has not completed onboarding yet — this is what the router's `/onboarding`
+  /// gate keys off. Persisted as an ISO-8601 string, matching the date
+  /// convention used elsewhere (see `Workout.date`), so the model stays free of
+  /// any Firestore `Timestamp` dependency.
+  final DateTime? onboardingCompletedAt;
 
   factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(
         uid: json['uid'] as String,
@@ -49,6 +57,8 @@ class AppUser {
             .map((e) => e as String)
             .toList(),
         activeProgramId: json['activeProgramId'] as String?,
+        onboardingCompletedAt:
+            DateTime.tryParse(json['onboardingCompletedAt'] as String? ?? ''),
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,6 +70,8 @@ class AppUser {
         'level': level.name,
         'goals': goals,
         if (activeProgramId != null) 'activeProgramId': activeProgramId,
+        if (onboardingCompletedAt != null)
+          'onboardingCompletedAt': onboardingCompletedAt!.toIso8601String(),
       };
 
   AppUser copyWith({
@@ -69,6 +81,7 @@ class AppUser {
     ExperienceLevel? level,
     List<String>? goals,
     String? activeProgramId,
+    DateTime? onboardingCompletedAt,
   }) =>
       AppUser(
         uid: uid,
@@ -79,5 +92,7 @@ class AppUser {
         level: level ?? this.level,
         goals: goals ?? this.goals,
         activeProgramId: activeProgramId ?? this.activeProgramId,
+        onboardingCompletedAt:
+            onboardingCompletedAt ?? this.onboardingCompletedAt,
       );
 }

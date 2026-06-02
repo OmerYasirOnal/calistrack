@@ -11,6 +11,22 @@ import 'package:calistrack/models/skill_progress.dart';
 import 'package:calistrack/models/workout.dart';
 import 'package:collection/collection.dart';
 
+/// A signed-in, already-onboarded user for tests that exercise the
+/// post-onboarding app (Today/Programs/Skills). The onboarding flag is set so
+/// the router's gate doesn't divert these tests to `/onboarding` — only the
+/// onboarding-specific tests deliberately leave it null.
+AppUser onboardedUser({
+  String uid = 'u1',
+  String email = 'a@b.com',
+  String? activeProgramId,
+}) =>
+    AppUser(
+      uid: uid,
+      email: email,
+      activeProgramId: activeProgramId,
+      onboardingCompletedAt: DateTime(2026, 1, 1),
+    );
+
 /// In-memory [AuthRepository] for tests. Emits an initial user (or null) and
 /// records calls so behaviour can be asserted without Firebase.
 class FakeAuthRepository implements AuthRepository {
@@ -89,6 +105,7 @@ class FakeUserRepository implements UserRepository {
   final Map<String, AppUser> store = {};
   int ensureCalls = 0;
   int setActiveCalls = 0;
+  int completeOnboardingCalls = 0;
 
   final Map<String, StreamController<AppUser?>> _controllers = {};
 
@@ -145,7 +162,17 @@ class FakeUserRepository implements UserRepository {
       level: base.level,
       goals: base.goals,
       activeProgramId: programId,
+      onboardingCompletedAt: base.onboardingCompletedAt,
     );
+    _emit(uid);
+  }
+
+  @override
+  Future<void> completeOnboarding(String uid, DateTime at) async {
+    completeOnboardingCalls++;
+    final base =
+        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
+    store[uid] = base.copyWith(onboardingCompletedAt: at);
     _emit(uid);
   }
 }

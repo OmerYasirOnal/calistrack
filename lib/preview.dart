@@ -28,11 +28,14 @@ import 'models/program.dart';
 import 'models/skill_progress.dart';
 import 'models/workout.dart';
 
-const _demoUser = AppUser(
+final _demoUser = AppUser(
   uid: 'preview',
   email: 'demo@calistrack.app',
   displayName: 'Demo',
   activeProgramId: 'classic_ppl',
+  // Already onboarded, so the preview opens straight into the app (not the
+  // first-run onboarding flow).
+  onboardingCompletedAt: DateTime(2026, 5, 1),
 );
 
 LoggedExercise _pushUp(int a, int b, int c) => LoggedExercise(
@@ -120,6 +123,12 @@ class _PreviewUsers implements UserRepository {
   Future<void> setActiveProgram(String uid, String? programId) async {
     final base = _store[uid] ?? _demoUser;
     _store[uid] = base.copyWith(activeProgramId: programId);
+  }
+
+  @override
+  Future<void> completeOnboarding(String uid, DateTime at) async {
+    final base = _store[uid] ?? _demoUser;
+    _store[uid] = base.copyWith(onboardingCompletedAt: at);
   }
 }
 

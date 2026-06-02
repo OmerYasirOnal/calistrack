@@ -64,6 +64,19 @@ Each task links to its GitHub issue once created.
 
 ---
 
+## M7 — Sellable first-run (post-MVP)  🚧 (issue #21; spec `docs/specs/2026-06-02-m7-sellable-first-run-design.md`)
+| Task | Title | Status | Issue | PR |
+|------|-------|--------|-------|----|
+| T25 | Onboarding gate + state (`onboardingCompletedAt`, router, controller) | REVIEW | #21 | — |
+| T26 | Onboarding screens: Welcome + About You | TODO | #21 | — |
+| T27 | Onboarding: recommended program + primer; funnel fix | TODO | #21 | — |
+| T28 | Exercise coaching content (cues; name everywhere) | TODO | #21 | — |
+| T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | TODO | #21 | — |
+| T30 | android/ios platforms + google_mobile_ads + AdMob IDs | TODO | #21 | — |
+| T31 | AdService (web no-op) + banner + interstitial (freq-capped) | TODO | #21 | — |
+
+---
+
 **MVP code-complete (2026-06-01): M1–M6 all merged to `main`, CI green (80.1% line coverage, 75% gate).**
 Remaining owner-only steps (cannot be done from this session): `flutterfire configure`
 (real Firebase config), deploy the Cloud Function (`firebase functions:secrets:set

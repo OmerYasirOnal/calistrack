@@ -73,7 +73,9 @@ String authErrorMessage(Object error) {
       'wrong-password' ||
       'invalid-credential' =>
         'Incorrect email or password.',
-      'email-already-in-use' => 'An account already exists for that email.',
+      'email-already-in-use' ||
+      'credential-already-in-use' =>
+        'That email already has an account — sign in with it instead.',
       'weak-password' => 'Please choose a stronger password.',
       'network-request-failed' => 'Network error. Check your connection.',
       _ => error.message ?? 'Authentication failed.',

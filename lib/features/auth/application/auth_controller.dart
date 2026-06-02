@@ -31,7 +31,9 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final current = _auth.currentUser;
       if (current != null && current.isAnonymous) {
-        // Upgrade the guest in place — same uid, so their data carries over.
+        // Upgrade the guest in place. linkWithCredential keeps the SAME uid,
+        // and all guest data (users/{uid}, workouts, programs, skills) is
+        // uid-keyed, so it carries over automatically — no migration needed.
         await _auth.linkEmailPassword(
           email: email,
           password: password,

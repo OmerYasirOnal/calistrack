@@ -114,9 +114,16 @@ class FirebaseAuthRepository implements AuthRepository {
     required String password,
     String displayName = '',
   }) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No guest session to upgrade.',
+      );
+    }
     final credential =
         EmailAuthProvider.credential(email: email, password: password);
-    final result = await _auth.currentUser!.linkWithCredential(credential);
+    final result = await user.linkWithCredential(credential);
     if (displayName.isNotEmpty) {
       await result.user?.updateDisplayName(displayName);
     }

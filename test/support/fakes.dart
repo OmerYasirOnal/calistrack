@@ -46,6 +46,8 @@ class FakeAuthRepository implements AuthRepository {
   int registerCalls = 0;
   int googleCalls = 0;
   int signOutCalls = 0;
+  int resetCalls = 0;
+  String? lastResetEmail;
 
   void dispose() => _controller.close();
 
@@ -90,6 +92,13 @@ class FakeAuthRepository implements AuthRepository {
     googleCalls++;
     if (errorToThrow != null) throw errorToThrow!;
     _set(const AppUser(uid: 'uid_google', email: 'google@example.com'));
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    resetCalls++;
+    lastResetEmail = email;
+    if (errorToThrow != null) throw errorToThrow!;
   }
 
   @override

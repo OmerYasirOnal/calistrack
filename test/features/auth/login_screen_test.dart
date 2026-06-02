@@ -34,4 +34,44 @@ void main() {
     expect(find.text('Password is required'), findsOneWidget);
     expect(auth.signInCalls, 0);
   });
+
+  testWidgets('forgot-password sends a reset email and closes the dialog',
+      (tester) async {
+    final auth = FakeAuthRepository();
+    final users = FakeUserRepository();
+    addTearDown(() {
+      auth.dispose();
+      users.dispose();
+    });
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          userRepositoryProvider.overrideWithValue(users),
+        ],
+        child: const CalisTrackApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Forgot password?'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reset password'), findsOneWidget);
+
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      'forgot@b.com',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Send link'));
+    await tester.pumpAndSettle();
+
+    expect(auth.resetCalls, 1);
+    expect(auth.lastResetEmail, 'forgot@b.com');
+    // Dialog closed; confirmation shown.
+    expect(find.text('Reset password'), findsNothing);
+    expect(find.textContaining('Reset link sent'), findsOneWidget);
+  });
 }

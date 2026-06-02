@@ -64,16 +64,24 @@ Each task links to its GitHub issue once created.
 
 ---
 
-## M7 — Sellable first-run (post-MVP)  🚧 (issue #21; spec `docs/specs/2026-06-02-m7-sellable-first-run-design.md`)
+## M7 — Sellable first-run (post-MVP)  ✅ (complete; issue #21 closed; spec `docs/specs/2026-06-02-m7-sellable-first-run-design.md`)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T25 | Onboarding gate + state (`onboardingCompletedAt`, router, controller) | REVIEW | #21 | — |
-| T26 | Onboarding screens: Welcome + About You | REVIEW | #21 | — |
-| T27 | Onboarding: recommended program + primer; funnel fix | REVIEW | #21 | — |
-| T28 | Exercise coaching content (cues; name everywhere) | REVIEW | #21 | — |
-| T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | REVIEW | #21 | — |
+| T25 | Onboarding gate + state (`onboardingCompletedAt`, router, controller) | DONE | #21 | #22 |
+| T26 | Onboarding screens: Welcome + About You | DONE | #21 | #23 |
+| T27 | Onboarding: recommended program + primer; funnel fix | DONE | #21 | #24 |
+| T28 | Exercise coaching content (cues; name everywhere) | DONE | #21 | #25 |
+| T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | DONE | #21 | #26 |
 | T30 | android/ios platforms + google_mobile_ads + AdMob IDs | DONE | #21 | (PR #26 bundle) |
-| T31 | AdService (web no-op) + banner + interstitial (freq-capped) | REVIEW | #21 | — |
+| T31 | AdService (web no-op) + banner + interstitial (freq-capped) | DONE | #21 | #27 |
+
+## M8 — Account recovery + launch polish  🚧 (issue #28)
+| Task | Title | Status | Issue | PR |
+|------|-------|--------|-------|----|
+| T32 | "Forgot password?" + reset dialog (sendPasswordResetEmail) | REVIEW | #28 | — |
+| T33 | Email verification (send on register + banner + resend) | TODO | #28 | — |
+| T34 | Branded splash (logo + name) | TODO | #28 | — |
+| T35 | Guest / "try without an account" (optional) | TODO | #28 | — |
 
 ---
 

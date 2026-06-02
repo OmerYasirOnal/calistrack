@@ -4,6 +4,17 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M8 T32 "Forgot password?" [branch feat/calistrack-m8-t32-forgot-password]
+- **Task:** remove the permanent-lockout landmine (audit major) — a password reset path.
+- **Added:** `AuthRepository.sendPasswordResetEmail`; a "Forgot password?" link on
+  the login screen opening a small reset dialog (email seeded from the login
+  field, own send state so it doesn't entangle the sign-in controller) → success
+  closes + "Reset link sent — check your inbox.", failure shows a retryable error.
+  Fake + preview updated.
+- **Tests:** tap → dialog → enter email → send → repo called with the email +
+  confirmation shown. 91 pass, 80.6% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 91/91 pass.
+
 ## 2026-06-02 — M7 T31 AdService + banner + interstitial [branch feat/calistrack-m7-t31-adservice]
 - **Task:** wire the chosen monetization (AdMob) safely.
 - **Added:** `AdService` abstraction with a **conditional import** — web/desktop/

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../models/program.dart';
+import '../../exercises/data/exercise_repository.dart';
 import '../../profile/application/profile_providers.dart';
 import '../application/program_providers.dart';
 import '../data/program_repository.dart';
@@ -124,14 +125,16 @@ class _ProgramDetail extends ConsumerWidget {
   }
 }
 
-class _DaySection extends StatelessWidget {
+class _DaySection extends ConsumerWidget {
   const _DaySection({required this.day});
 
   final ProgramDay day;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final cues = ref.watch(exerciseCuesProvider).valueOrNull ?? const {};
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,6 +150,14 @@ class _DaySection extends StatelessWidget {
                 ListTile(
                   dense: true,
                   title: Text(ex.name),
+                  subtitle: cues[ex.exerciseId] == null
+                      ? null
+                      : Text(
+                          cues[ex.exerciseId]!,
+                          style: text.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
                   trailing: Text(
                     targetSummary(ex),
                     style: text.labelLarge?.copyWith(

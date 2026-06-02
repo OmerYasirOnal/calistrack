@@ -65,3 +65,14 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>(
 final exerciseLibraryProvider = FutureProvider<List<Exercise>>(
   (ref) => ref.watch(exerciseRepositoryProvider).all(),
 );
+
+/// Movement id → one-line coaching cue, derived from the library. Used by the
+/// logging and program-detail surfaces so a movement is never shown without
+/// context. Empty cues are omitted.
+final exerciseCuesProvider = FutureProvider<Map<String, String>>((ref) async {
+  final library = await ref.watch(exerciseLibraryProvider.future);
+  return {
+    for (final e in library)
+      if (e.description.isNotEmpty) e.id: e.description,
+  };
+});

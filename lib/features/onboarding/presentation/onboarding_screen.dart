@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/app_user.dart';
 import '../../../models/program.dart';
+import '../../exercises/data/exercise_repository.dart';
 import '../../programs/application/ai_program_service.dart';
 import '../../programs/presentation/program_format.dart';
 import '../../workout/application/workout_session.dart';
@@ -504,15 +505,16 @@ class _Building extends StatelessWidget {
 
 /// Final step: a quick look at the first session + a legend, then "Start
 /// training" drops the user into that session on the Today tab.
-class _PrimerStep extends StatelessWidget {
+class _PrimerStep extends ConsumerWidget {
   const _PrimerStep({required this.program});
 
   final Program? program;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final cues = ref.watch(exerciseCuesProvider).valueOrNull ?? const {};
     final firstDay = program?.days.firstWhereOrNull((d) => !d.isRest);
 
     return ListView(
@@ -551,17 +553,36 @@ class _PrimerStep extends StatelessWidget {
                   const SizedBox(height: Spacing.xs),
                   for (final ex in firstDay.exercises)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: Text(ex.name)),
-                          Text(
-                            targetSummary(ex),
-                            style: text.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  ex.name,
+                                  style: text.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                targetSummary(ex),
+                                style: text.bodySmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
+                          if (cues[ex.exerciseId] != null)
+                            Text(
+                              cues[ex.exerciseId]!,
+                              style: text.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
                         ],
                       ),
                     ),

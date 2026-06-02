@@ -1,25 +1,25 @@
 [
-  { "id": "push_up", "name": "Push-up", "muscleGroup": "push", "type": "reps", "description": "Horizontal push." },
-  { "id": "diamond_push_up", "name": "Diamond Push-up", "muscleGroup": "push", "type": "reps", "description": "Triceps-focused push-up." },
-  { "id": "dip", "name": "Dip", "muscleGroup": "push", "type": "weightedReps", "description": "Parallel-bar dip." },
-  { "id": "pike_push_up", "name": "Pike Push-up", "muscleGroup": "push", "type": "reps", "description": "Shoulder push." },
-  { "id": "pseudo_planche_push_up", "name": "Pseudo Planche Push-up", "muscleGroup": "push", "type": "reps", "description": "Leaned-forward push." },
+  { "id": "push_up", "name": "Push-up", "muscleGroup": "push", "type": "reps", "description": "Hands under shoulders, body in one straight line — lower until elbows reach about 90°, then press up." },
+  { "id": "diamond_push_up", "name": "Diamond Push-up", "muscleGroup": "push", "type": "reps", "description": "Index fingers and thumbs touching under the chest; keep elbows tucked to load the triceps." },
+  { "id": "dip", "name": "Dip", "muscleGroup": "push", "type": "weightedReps", "description": "Lean slightly forward, lower until your shoulders drop below your elbows, then press to a full lockout." },
+  { "id": "pike_push_up", "name": "Pike Push-up", "muscleGroup": "push", "type": "reps", "description": "Hips high in an inverted V; lower the crown of your head toward the floor between your hands." },
+  { "id": "pseudo_planche_push_up", "name": "Pseudo Planche Push-up", "muscleGroup": "push", "type": "reps", "description": "Lean your shoulders out past your hands, fingers pointing back, to load the planche line." },
 
-  { "id": "pull_up", "name": "Pull-up", "muscleGroup": "pull", "type": "weightedReps", "description": "Vertical pull, pronated." },
-  { "id": "chin_up", "name": "Chin-up", "muscleGroup": "pull", "type": "weightedReps", "description": "Vertical pull, supinated." },
-  { "id": "australian_row", "name": "Australian Row", "muscleGroup": "pull", "type": "reps", "description": "Horizontal bodyweight row." },
-  { "id": "scapular_pull", "name": "Scapular Pull", "muscleGroup": "pull", "type": "reps", "description": "Scapular retraction hang." },
+  { "id": "pull_up", "name": "Pull-up", "muscleGroup": "pull", "type": "weightedReps", "description": "From a dead hang, pull until your chin clears the bar; control the descent all the way down." },
+  { "id": "chin_up", "name": "Chin-up", "muscleGroup": "pull", "type": "weightedReps", "description": "Underhand grip — drive your elbows down to your ribs and squeeze at the top." },
+  { "id": "australian_row", "name": "Australian Row", "muscleGroup": "pull", "type": "reps", "description": "Body straight under a low bar; pull your chest to the bar and squeeze the shoulder blades together." },
+  { "id": "scapular_pull", "name": "Scapular Pull", "muscleGroup": "pull", "type": "reps", "description": "Hanging with straight arms, pull your shoulder blades down and back without bending the elbows." },
 
-  { "id": "pistol_squat", "name": "Pistol Squat", "muscleGroup": "legs", "type": "reps", "description": "Single-leg squat." },
-  { "id": "bulgarian_split_squat", "name": "Bulgarian Split Squat", "muscleGroup": "legs", "type": "weightedReps", "description": "Rear-foot-elevated squat." },
-  { "id": "nordic_curl", "name": "Nordic Curl", "muscleGroup": "legs", "type": "reps", "description": "Hamstring eccentric." },
-  { "id": "calf_raise", "name": "Calf Raise", "muscleGroup": "legs", "type": "reps", "description": "Standing calf raise." },
+  { "id": "pistol_squat", "name": "Pistol Squat", "muscleGroup": "legs", "type": "reps", "description": "Sit back on one leg with the other extended forward; descend slowly and stand to full lockout." },
+  { "id": "bulgarian_split_squat", "name": "Bulgarian Split Squat", "muscleGroup": "legs", "type": "weightedReps", "description": "Rear foot elevated; drop straight down over the front heel, knee tracking over the toes." },
+  { "id": "nordic_curl", "name": "Nordic Curl", "muscleGroup": "legs", "type": "reps", "description": "Knees anchored, lower your torso as slowly as you can, resisting the whole way with the hamstrings." },
+  { "id": "calf_raise", "name": "Calf Raise", "muscleGroup": "legs", "type": "reps", "description": "Rise onto the balls of your feet for a full stretch-to-squeeze; pause at the top of each rep." },
 
-  { "id": "hanging_leg_raise", "name": "Hanging Leg Raise", "muscleGroup": "core", "type": "reps", "description": "Hanging core flexion." },
-  { "id": "plank", "name": "Plank", "muscleGroup": "core", "type": "hold", "description": "Front isometric hold." },
-  { "id": "hollow_hold", "name": "Hollow Hold", "muscleGroup": "core", "type": "hold", "description": "Hollow-body isometric." },
-  { "id": "l_sit", "name": "L-sit", "muscleGroup": "core", "type": "hold", "description": "Compression hold." },
+  { "id": "hanging_leg_raise", "name": "Hanging Leg Raise", "muscleGroup": "core", "type": "reps", "description": "From a hang, raise straight legs to at least hip height without swinging or kipping." },
+  { "id": "plank", "name": "Plank", "muscleGroup": "core", "type": "hold", "description": "Forearms down, body in one line from head to heels; brace your abs and squeeze your glutes." },
+  { "id": "hollow_hold", "name": "Hollow Hold", "muscleGroup": "core", "type": "hold", "description": "Press your lower back flat into the floor with arms and legs extended just above it." },
+  { "id": "l_sit", "name": "L-sit", "muscleGroup": "core", "type": "hold", "description": "Support on your hands, legs straight out in front and toes pointed — hold the compression." },
 
-  { "id": "easy_run", "name": "Easy Run", "muscleGroup": "cardio", "type": "distance", "description": "Conversational-pace run." },
-  { "id": "intervals", "name": "Intervals", "muscleGroup": "cardio", "type": "time", "description": "Timed high-intensity intervals." }
+  { "id": "easy_run", "name": "Easy Run", "muscleGroup": "cardio", "type": "distance", "description": "Keep a conversational pace — you should be able to talk in full sentences the whole way." },
+  { "id": "intervals", "name": "Intervals", "muscleGroup": "cardio", "type": "time", "description": "Alternate hard efforts with easy recovery; keep the hard reps fast but repeatable." }
 ]

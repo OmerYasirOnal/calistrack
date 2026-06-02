@@ -4,6 +4,21 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — 🎯 Launch runbook + privacy-policy draft [branch docs/calistrack-launch-runbook]
+- **Task:** capture the remaining OWNER-ONLY launch steps so the handoff is complete.
+- **Added:** `LAUNCH.md` (ordered owner runbook: flutterfire configure · deploy the
+  AI function with the OpenAI secret · real AdMob app/unit ids + UMP console form +
+  on-device verification · privacy policy + store data-safety · app icon · iOS/Android
+  signing · pre-submit checks) and `docs/privacy-policy.md` (a reviewable draft
+  covering account/profile/workout data, Firebase, AdMob/IDFA + ATT/UMP, OpenAI).
+- **State:** CalisTrack is code-complete through M10 (MVP M1–M6 + sellable first-run
+  M7 + account-recovery/polish M8 + profile editing M9 + verification-audit fixes
+  M10). A 14-task autonomous build, every PR adversarially reviewed, 101 tests,
+  ~82% coverage, CI green. Nothing further is buildable without the owner's
+  accounts/credentials/device.
+
+---
+
 ## 2026-06-02 — M10 T38 Ad consent (GDPR/UMP + iOS ATT) [branch feat/calistrack-m10-t38-ad-consent]
 - **Task:** the re-audit flagged the consent/ATT TODO stubs as gating ad legality.
 - **Added:** MobileAdService.initialize now (1) requests iOS App Tracking

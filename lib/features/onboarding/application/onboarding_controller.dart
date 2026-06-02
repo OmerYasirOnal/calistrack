@@ -29,7 +29,10 @@ class OnboardingController extends AutoDisposeAsyncNotifier<void> {
       }
       await ref.read(userRepositoryProvider).completeOnboarding(
             uid,
-            DateTime.now(),
+            // UTC to match the repo's date convention (Workout.date), so the
+            // stamp compares cleanly against other timestamps regardless of the
+            // device's timezone.
+            DateTime.now().toUtc(),
           );
     });
   }

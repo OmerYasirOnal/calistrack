@@ -137,6 +137,7 @@ class _ForgotPasswordDialog extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordDialogState extends ConsumerState<_ForgotPasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _email =
       TextEditingController(text: widget.initialEmail);
   bool _sending = false;
@@ -148,8 +149,10 @@ class _ForgotPasswordDialogState extends ConsumerState<_ForgotPasswordDialog> {
   }
 
   Future<void> _send() async {
+    // Validate (required + format) so an empty/invalid email shows a field error
+    // rather than silently doing nothing — same rules as the login form.
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     final email = _email.text.trim();
-    if (email.isEmpty) return;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     setState(() => _sending = true);
@@ -175,19 +178,16 @@ class _ForgotPasswordDialogState extends ConsumerState<_ForgotPasswordDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Reset password'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text("Enter your email and we'll send you a reset link."),
-          const SizedBox(height: Spacing.md),
-          TextField(
-            controller: _email,
-            enabled: !_sending,
-            keyboardType: TextInputType.emailAddress,
-            autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(labelText: 'Email'),
-          ),
-        ],
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Enter your email and we'll send you a reset link."),
+            const SizedBox(height: Spacing.md),
+            EmailField(controller: _email, enabled: !_sending),
+          ],
+        ),
       ),
       actions: [
         TextButton(

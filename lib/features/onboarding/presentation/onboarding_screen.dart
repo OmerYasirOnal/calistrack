@@ -39,6 +39,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final submitting = ref.watch(onboardingControllerProvider).isLoading;
 
+    // Keep the captured answers alive for the whole flow. Stepping Back unmounts
+    // the About You step (the only other watcher), which would otherwise let the
+    // AutoDispose provider reset and silently discard the user's selections.
+    ref.watch(onboardingAnswersProvider);
+
     ref.listen(onboardingControllerProvider, (_, next) {
       if (next.hasError && !next.isLoading) {
         ScaffoldMessenger.of(context)
@@ -240,13 +245,17 @@ class _AboutYouStep extends ConsumerWidget {
         Row(
           children: [
             IconButton(
-              onPressed: () => controller.setDays(answers.daysPerWeek - 1),
+              onPressed: answers.daysPerWeek <= onboardingMinDays
+                  ? null
+                  : () => controller.setDays(answers.daysPerWeek - 1),
               icon: const Icon(Icons.remove_circle_outline),
               tooltip: 'Fewer days',
             ),
             Text('${answers.daysPerWeek}', style: text.titleLarge),
             IconButton(
-              onPressed: () => controller.setDays(answers.daysPerWeek + 1),
+              onPressed: answers.daysPerWeek >= onboardingMaxDays
+                  ? null
+                  : () => controller.setDays(answers.daysPerWeek + 1),
               icon: const Icon(Icons.add_circle_outline),
               tooltip: 'More days',
             ),

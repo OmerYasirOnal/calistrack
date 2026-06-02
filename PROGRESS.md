@@ -4,6 +4,35 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T31 AdService + banner + interstitial [branch feat/calistrack-m7-t31-adservice]
+- **Task:** wire the chosen monetization (AdMob) safely.
+- **Added:** `AdService` abstraction with a **conditional import** — web/desktop/
+  tests get a `NoOpAdService`, mobile gets the `google_mobile_ads`-backed
+  `MobileAdService` (so the web build never imports the ads SDK, which has no web
+  support — verified `flutter build web -t lib/preview.dart` still compiles).
+  `AdConfig` (test vs prod, android vs ios, from `ad_config.json`); a pure
+  `shouldShowInterstitial(count, everyN)` cap; a banner on the Progress tab; an
+  interstitial after a finished session (internal session counter, config-capped);
+  `MobileAds.initialize()` at startup (guarded, no-op off-device); ATT/UMP left
+  as a documented owner-TODO.
+- **Safe in tests:** `MobileAdService.isSupported` is false on the non-mobile test
+  VM, so every method no-ops without touching the SDK — widget tests need no
+  override.
+- **Tests:** cap logic, AdConfig selection (env/platform + default), NoOpAdService.
+  90 pass, 80.5% coverage, web build green.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 90/90 pass.
+
+## 2026-06-02 — M7 T30 android/ios platforms + google_mobile_ads + AdMob config [bundled into PR #26]
+- **Task:** native platforms + AdMob dependency/config (foundation for T31).
+- **Added:** `flutter create` android + ios (org com.calistrack); `google_mobile_ads`
+  dependency; `assets/data/ad_config.json` (test sample units + owner-TODO prod ids
+  + `interstitialEverySessions` pacing cap); AdMob App ID meta-data in
+  AndroidManifest.xml + iOS Info.plist (Google sample/test ids, owner-TODO) + iOS
+  NSUserTrackingUsageDescription. Removed the flutter-create template test.
+- **Note:** a local branch mix-up landed commit `873a2bc` on the T29 branch, so it
+  merged via **PR #26 alongside T29** (CI-green) rather than its own PR; its
+  adversarial review is folded into T31's. Confirmed present in `main`.
+
 ## 2026-06-02 — M7 T29 Guidance polish [branch feat/calistrack-m7-t29-guidance]
 - **Task:** funnel + educate at the empty/idle moments.
 - **Added:** Progress empty-state CTA "Log your first workout" → Today; a

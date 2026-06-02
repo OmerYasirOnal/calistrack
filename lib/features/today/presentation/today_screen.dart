@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/program.dart';
+import '../../ads/application/ad_service.dart';
 import '../../programs/application/program_providers.dart';
 import '../../workout/application/workout_session.dart';
 import '../../workout/data/training_defaults.dart';
@@ -89,7 +90,19 @@ class _ActiveDayState extends ConsumerState<_ActiveDay> {
     try {
       final workout = await ref.read(workoutSessionProvider.notifier).finish();
       if (!mounted) return;
-      if (workout != null) await showSessionSummary(context, workout);
+      if (workout != null) {
+        await showSessionSummary(context, workout);
+        // Count this session and maybe show an interstitial (capped; no-op on
+        // web/desktop/tests). Its own try so an ad failure never masquerades as
+        // a save failure — the session is already persisted by this point.
+        if (mounted) {
+          try {
+            await ref.read(adServiceProvider).maybeShowInterstitial();
+          } catch (e) {
+            debugPrint('Interstitial failed to show: $e');
+          }
+        }
+      }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)

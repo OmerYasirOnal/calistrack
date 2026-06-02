@@ -4,6 +4,28 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T27 Onboarding: recommended program + primer (straight line to first set) [branch feat/calistrack-m7-t27-program-primer]
+- **Task:** finish the onboarding spine — recommend a program and drop the user
+  straight into their first session.
+- **Added:** two more steps to `OnboardingScreen` (now Welcome → About You →
+  **Your program** → **First session primer**). The program step reuses the
+  existing `AiGenerationController` to generate from the captured answers (AI when
+  reachable, deterministic local fallback otherwise) and previews it; "Start this
+  program" saves + activates it. The primer shows Day 1 + a plain-language note,
+  and **"Start training" starts the Day-1 workout session and completes
+  onboarding** — so the gate lands the user on Today already mid-session, ready to
+  log (the funnel "straight line", no behavior change to Today → existing tests
+  stay green). Escape hatch: "Pick one myself" finishes onboarding without a
+  program (empty Today guides to Programs).
+- **Tests:** full-flow integration (Welcome → … → Today session, asserts answers
+  + flag + active program persisted) with an injected deterministic caller; About
+  You step tests refocused (Continue advances; selections survive Back). 81 pass,
+  81.5% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 81/81 pass.
+- **Deferred:** the *Programs-tab* set-active dead-end (audit's secondary funnel
+  gap) → folded into T29 guidance polish, to avoid reworking programs_screen_test
+  here.
+
 ## 2026-06-02 — M7 T26 Onboarding screens: Welcome + About You [branch feat/calistrack-m7-t26-about-you]
 - **Task:** turn the minimal onboarding into a real multi-step flow that captures
   personalization.

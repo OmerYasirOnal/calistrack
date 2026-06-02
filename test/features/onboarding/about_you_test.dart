@@ -39,8 +39,7 @@ void main() {
     });
   });
 
-  testWidgets('About You answers are persisted to the profile on finish',
-      (tester) async {
+  Future<void> pumpAboutYou(WidgetTester tester) async {
     const uid = 'newbie';
     final auth = FakeAuthRepository(
       initialUser: const AppUser(uid: uid, email: 'new@b.com'),
@@ -62,116 +61,50 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-
     // Welcome → About You.
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
+  }
 
-    // Pick an experience level + a couple of goals.
+  testWidgets('About You → Continue advances toward the program step',
+      (tester) async {
+    await pumpAboutYou(tester);
+    expect(find.text('About you'), findsOneWidget);
+
     await tester.tap(find.text('Intermediate'));
     await tester.tap(find.text('Skill'));
-    await tester.tap(find.text('Strength'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Finish setup'));
+    await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    final saved = users.store[uid]!;
-    expect(saved.onboardingCompletedAt, isNotNull);
-    expect(saved.level, ExperienceLevel.intermediate);
-    expect(saved.goals, unorderedEquals(<String>['Skill', 'Strength']));
+    // The program step is reached (generation kicks off / previews).
+    expect(find.text('About you'), findsNothing);
+    expect(
+      find.textContaining('program', findRichText: false),
+      findsWidgets,
+    );
   });
 
-  testWidgets('optional body stats are persisted when entered', (tester) async {
-    const uid = 'newbie';
-    final auth = FakeAuthRepository(
-      initialUser: const AppUser(uid: uid, email: 'new@b.com'),
-    );
-    final users = FakeUserRepository()
-      ..store[uid] = const AppUser(uid: uid, email: 'new@b.com');
-    addTearDown(() {
-      auth.dispose();
-      users.dispose();
-    });
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(auth),
-          userRepositoryProvider.overrideWithValue(users),
-        ],
-        child: const CalisTrackApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
-
-    // Expand the optional body-stats section (scroll it above the footer first
-    // — the default 800x600 test surface otherwise puts it under the footer)
-    // and enter values. enterText targets the field directly, no hit-test.
-    final statsTile = find.text('Add body stats (optional)');
-    await tester.ensureVisible(statsTile);
-    await tester.pumpAndSettle();
-    await tester.tap(statsTile);
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Height (cm)'),
-      '180',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Weight (kg)'),
-      '74.5',
-    );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Finish setup'));
-    await tester.pumpAndSettle();
-
-    final saved = users.store[uid]!;
-    expect(saved.heightCm, 180);
-    expect(saved.weightKg, 74.5);
-  });
-
-  testWidgets('answers survive stepping Back to Welcome and forward again',
+  testWidgets('selections survive stepping Back to Welcome and forward again',
       (tester) async {
-    const uid = 'newbie';
-    final auth = FakeAuthRepository(
-      initialUser: const AppUser(uid: uid, email: 'new@b.com'),
-    );
-    final users = FakeUserRepository()
-      ..store[uid] = const AppUser(uid: uid, email: 'new@b.com');
-    addTearDown(() {
-      auth.dispose();
-      users.dispose();
-    });
+    await pumpAboutYou(tester);
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(auth),
-          userRepositoryProvider.overrideWithValue(users),
-        ],
-        child: const CalisTrackApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // About You → pick a goal → Back to Welcome → forward again.
-    await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
     await tester.tap(find.text('Skill'));
     await tester.pumpAndSettle();
+
     await tester.tap(find.text('Back'));
     await tester.pumpAndSettle();
     expect(find.text('Welcome to CalisTrack'), findsOneWidget);
+
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
 
-    // The selection survived (not reset by the AutoDispose provider).
-    await tester.tap(find.text('Finish setup'));
-    await tester.pumpAndSettle();
-    expect(users.store[uid]!.goals, unorderedEquals(<String>['Skill']));
+    // The 'Skill' chip is still selected — the AutoDispose answers provider was
+    // kept alive across the Back navigation rather than reset.
+    final chip = tester.widget<FilterChip>(
+      find.widgetWithText(FilterChip, 'Skill'),
+    );
+    expect(chip.selected, isTrue);
   });
 }

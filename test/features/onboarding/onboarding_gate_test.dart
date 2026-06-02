@@ -134,17 +134,19 @@ void main() {
     });
   });
 
-  testWidgets(
-      'a new user is routed to onboarding, then completing it lands '
-      'on Today', (tester) async {
-    const uid = 'newbie';
+  testWidgets('a new user is routed to onboarding, an onboarded one to Today',
+      (tester) async {
     final auth = FakeAuthRepository(
-      initialUser: const AppUser(uid: uid, email: 'new@b.com'),
+      initialUser: const AppUser(uid: 'newbie', email: 'new@b.com'),
     );
-    final users = FakeUserRepository();
     // A profile doc exists (as _bootstrapProfile would create) with the
     // onboarding flag unset.
-    users.store[uid] = const AppUser(uid: uid, email: 'new@b.com');
+    final users = FakeUserRepository()
+      ..store['newbie'] = const AppUser(uid: 'newbie', email: 'new@b.com');
+    addTearDown(() {
+      auth.dispose();
+      users.dispose();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
@@ -157,24 +159,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Gate sends the new user to onboarding, not the empty Today shell.
+    // New user → onboarding (Welcome), not the empty Today shell. (The full
+    // completion path is covered by onboarding_flow_test.)
     expect(find.byType(OnboardingScreen), findsOneWidget);
+    expect(find.text('Welcome to CalisTrack'), findsOneWidget);
     expect(find.text('No active program yet'), findsNothing);
-
-    // Welcome → About You → Finish stamps the profile; the gate routes to Today.
-    await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
-    expect(find.text('About you'), findsOneWidget);
-
-    await tester.tap(find.text('Finish setup'));
-    await tester.pumpAndSettle();
-
-    expect(users.completeOnboardingCalls, 1);
-    expect(users.store[uid]!.onboardingCompletedAt, isNotNull);
-    expect(find.byType(OnboardingScreen), findsNothing);
-    expect(find.text('No active program yet'), findsOneWidget);
-
-    auth.dispose();
-    users.dispose();
   });
 }

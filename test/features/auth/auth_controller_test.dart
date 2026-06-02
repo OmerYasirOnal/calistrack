@@ -54,6 +54,8 @@ void main() {
 
     expect(auth.registerCalls, 1);
     expect(users.store['uid_new@b.com']?.displayName, 'Athlete');
+    // A verification email is sent on sign-up.
+    expect(auth.verifyCalls, 1);
   });
 
   test('a failed sign-in surfaces as an error state and skips bootstrap',

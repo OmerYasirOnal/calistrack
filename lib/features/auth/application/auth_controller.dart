@@ -35,6 +35,10 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
         displayName: displayName,
       );
       await _bootstrapProfile();
+      // Best-effort: a failed verification email must not fail registration.
+      try {
+        await _auth.sendEmailVerification();
+      } catch (_) {/* user can resend from Profile */}
     });
   }
 

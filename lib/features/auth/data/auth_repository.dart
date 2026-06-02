@@ -29,6 +29,9 @@ abstract interface class AuthRepository {
   /// Sends a password-reset email (no-op visible to the user beyond the inbox).
   Future<void> sendPasswordResetEmail(String email);
 
+  /// Sends a verification email to the currently signed-in user (no-op if none).
+  Future<void> sendEmailVerification();
+
   Future<void> signOut();
 }
 
@@ -40,6 +43,7 @@ AppUser? mapFirebaseUser(User? user) => user == null
         uid: user.uid,
         email: user.email ?? '',
         displayName: user.displayName ?? '',
+        emailVerified: user.emailVerified,
       );
 
 class FirebaseAuthRepository implements AuthRepository {
@@ -92,6 +96,14 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<void> sendPasswordResetEmail(String email) =>
       _auth.sendPasswordResetEmail(email: email);
+
+  @override
+  Future<void> sendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
 
   @override
   Future<void> signOut() async {

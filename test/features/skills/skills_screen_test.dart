@@ -31,7 +31,7 @@ const _presets = [
 void main() {
   testWidgets('lists skills, opens a detail, logs an attempt + advances',
       (tester) async {
-    const me = AppUser(uid: 'u1', email: 'a@b.com');
+    final me = onboardedUser();
     final auth = FakeAuthRepository(initialUser: me);
     final users = FakeUserRepository()..store['u1'] = me;
     final skills = FakeSkillRepository(_presets);

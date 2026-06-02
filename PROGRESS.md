@@ -4,6 +4,23 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T25 Onboarding gate + state [branch feat/calistrack-m7-t25-onboarding-gate]
+- **Task:** the spine of the first-run onboarding — a router gate + completion state.
+- **Added:** `AppUser.onboardingCompletedAt` (DateTime?, ISO-8601 round-trip,
+  Firebase-free); `UserRepository.completeOnboarding(uid, at)` (targeted merge);
+  `OnboardingController.complete()` (stamps the flag, surfaces errors); a pure
+  `authRedirect()` extracted from the router so the gate's branches are unit-
+  testable; `/onboarding` route + a minimal Welcome `OnboardingScreen` (T26/T27
+  expand it). Router now also watches `currentUserProfileProvider` so the gate
+  keys off the profile, not just the auth identity.
+- **Gate logic:** signed-out → /login; signed-in + profile flag null → /onboarding;
+  flag set → kept out of auth+onboarding; profile not-yet-known → no forced
+  redirect (no trap). Preview + test fixtures marked onboarded so existing
+  full-app tests still land on Today (`onboardedUser()` helper).
+- **Tests:** AppUser flag round-trip; 5 pure-gate branch cases; end-to-end
+  new-user → onboarding → complete → Today. 76 tests pass, 80.7% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 76/76 pass.
+
 ## 2026-06-02 — 🎉 MVP CODE-COMPLETE (M1–M6 all merged to `main`)
 - **Milestones:** M1 Foundation · M2 Auth · M3 Programs & Workout · M4 Progress &
   Skills · M5 AI generation (Cloud Function + fallback) · M6 Polish — all done,

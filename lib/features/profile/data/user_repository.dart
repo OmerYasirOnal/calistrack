@@ -19,6 +19,10 @@ abstract interface class UserRepository {
   /// Sets (or clears, when null) the user's active program — a targeted merge
   /// that never rewrites the rest of the profile.
   Future<void> setActiveProgram(String uid, String? programId);
+
+  /// Stamps the one-time onboarding completion — a targeted merge that never
+  /// rewrites the rest of the profile. Flips the router's `/onboarding` gate.
+  Future<void> completeOnboarding(String uid, DateTime at);
 }
 
 class FirestoreUserRepository implements UserRepository {
@@ -57,6 +61,12 @@ class FirestoreUserRepository implements UserRepository {
   @override
   Future<void> setActiveProgram(String uid, String? programId) => _doc(uid).set(
         {'activeProgramId': programId},
+        SetOptions(merge: true),
+      );
+
+  @override
+  Future<void> completeOnboarding(String uid, DateTime at) => _doc(uid).set(
+        {'onboardingCompletedAt': at.toIso8601String()},
         SetOptions(merge: true),
       );
 }

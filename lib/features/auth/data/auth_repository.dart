@@ -26,6 +26,17 @@ abstract interface class AuthRepository {
 
   Future<void> signInWithGoogle();
 
+  /// Starts a guest (anonymous) session.
+  Future<void> signInAnonymously();
+
+  /// Upgrades the current anonymous session to a permanent email/password
+  /// account, keeping the same uid so all the guest's data carries over.
+  Future<void> linkEmailPassword({
+    required String email,
+    required String password,
+    String displayName,
+  });
+
   /// Sends a password-reset email (no-op visible to the user beyond the inbox).
   Future<void> sendPasswordResetEmail(String email);
 
@@ -44,6 +55,7 @@ AppUser? mapFirebaseUser(User? user) => user == null
         email: user.email ?? '',
         displayName: user.displayName ?? '',
         emailVerified: user.emailVerified,
+        isAnonymous: user.isAnonymous,
       );
 
 class FirebaseAuthRepository implements AuthRepository {
@@ -91,6 +103,23 @@ class FirebaseAuthRepository implements AuthRepository {
       idToken: googleAuth.idToken,
     );
     await _auth.signInWithCredential(credential);
+  }
+
+  @override
+  Future<void> signInAnonymously() => _auth.signInAnonymously();
+
+  @override
+  Future<void> linkEmailPassword({
+    required String email,
+    required String password,
+    String displayName = '',
+  }) async {
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+    final result = await _auth.currentUser!.linkWithCredential(credential);
+    if (displayName.isNotEmpty) {
+      await result.user?.updateDisplayName(displayName);
+    }
   }
 
   @override

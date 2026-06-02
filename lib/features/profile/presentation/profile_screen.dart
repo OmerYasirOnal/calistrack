@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/data/auth_repository.dart';
@@ -62,7 +64,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (!user.emailVerified) ...[
+              if (user.isAnonymous) ...[
+                const SizedBox(height: Spacing.md),
+                const _GuestUpgradeCard(),
+              ] else if (!user.emailVerified) ...[
                 const SizedBox(height: Spacing.md),
                 const _VerifyEmailCard(),
               ],
@@ -77,6 +82,52 @@ class ProfileScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Shown on Profile for a guest (anonymous) session — invites creating a real
+/// account. Registering from here links in place, so guest data carries over.
+class _GuestUpgradeCard extends StatelessWidget {
+  const _GuestUpgradeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Card(
+      color: scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.person_outline, color: scheme.primary),
+                const SizedBox(width: Spacing.sm),
+                Expanded(
+                  child: Text('You’re a guest', style: text.titleSmall),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.xs),
+            Text(
+              'Create an account to back up your progress and sign in on other '
+              'devices. Your current data carries over.',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: Spacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton(
+                onPressed: () => context.go(Routes.register),
+                child: const Text('Create an account'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

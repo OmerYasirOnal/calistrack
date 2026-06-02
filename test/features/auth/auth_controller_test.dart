@@ -58,6 +58,38 @@ void main() {
     expect(auth.verifyCalls, 1);
   });
 
+  test('signInAnonymously starts a guest session and bootstraps a profile',
+      () async {
+    final auth = FakeAuthRepository();
+    final users = FakeUserRepository();
+    final container = _container(auth, users);
+
+    await container.read(authControllerProvider.notifier).signInAnonymously();
+
+    expect(auth.anonymousCalls, 1);
+    expect(auth.currentUser?.isAnonymous, isTrue);
+    expect(users.ensureCalls, 1);
+  });
+
+  test('register while a guest links in place (same uid, no new account)',
+      () async {
+    final auth = FakeAuthRepository(
+      initialUser:
+          const AppUser(uid: 'uid_guest', email: '', isAnonymous: true),
+    );
+    final users = FakeUserRepository();
+    final container = _container(auth, users);
+
+    await container
+        .read(authControllerProvider.notifier)
+        .registerWithEmail('real@b.com', 'secret123', displayName: 'Athlete');
+
+    expect(auth.linkCalls, 1, reason: 'upgrade should LINK, not create');
+    expect(auth.registerCalls, 0);
+    expect(auth.currentUser?.isAnonymous, isFalse);
+    expect(auth.currentUser?.uid, 'uid_guest', reason: 'uid must carry over');
+  });
+
   test('a failed sign-in surfaces as an error state and skips bootstrap',
       () async {
     final auth = FakeAuthRepository()..errorToThrow = Exception('nope');

@@ -113,6 +113,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           loading ? null : () => context.go(Routes.register),
                       child: const Text("Don't have an account? Register"),
                     ),
+                    TextButton(
+                      onPressed: loading
+                          ? null
+                          : () => ref
+                              .read(authControllerProvider.notifier)
+                              .signInAnonymously(),
+                      child: const Text('Try without an account'),
+                    ),
                   ],
                 ),
               ),

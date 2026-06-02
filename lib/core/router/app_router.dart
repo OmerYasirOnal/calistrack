@@ -54,11 +54,16 @@ String? authRedirect({
   // Don't bounce the user while the auth identity is still resolving.
   if (auth.isLoading) return null;
 
-  final signedIn = auth.valueOrNull != null;
+  final identity = auth.valueOrNull;
+  final signedIn = identity != null;
   final atAuthRoute = location == Routes.login || location == Routes.register;
   final atOnboarding = location == Routes.onboarding;
 
   if (!signedIn) return atAuthRoute ? null : Routes.login;
+
+  // A guest (anonymous) session may reach /register to upgrade in place — the
+  // gate would otherwise bounce a signed-in user off the auth routes.
+  if (identity.isAnonymous && location == Routes.register) return null;
 
   // Signed in. The onboarding decision needs the Firestore profile. Until we
   // actually have it (still loading, errored, or the doc isn't written yet),

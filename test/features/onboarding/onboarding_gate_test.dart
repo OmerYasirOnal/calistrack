@@ -104,6 +104,29 @@ void main() {
       );
     });
 
+    test('a signed-in guest may reach /register to upgrade', () {
+      final guest = _data(
+        const AppUser(uid: 'g', email: '', isAnonymous: true),
+      );
+      expect(
+        authRedirect(
+          auth: guest,
+          profile: const AsyncValue.data(null),
+          location: Routes.register,
+        ),
+        isNull,
+      );
+      // ...but a guest is still routed normally elsewhere (no profile yet).
+      expect(
+        authRedirect(
+          auth: guest,
+          profile: const AsyncValue.data(null),
+          location: Routes.login,
+        ),
+        Routes.today,
+      );
+    });
+
     test('signed in, onboarding done → kept out of auth + onboarding routes',
         () {
       expect(

@@ -29,6 +29,7 @@ class AppUser {
     this.activeProgramId,
     this.onboardingCompletedAt,
     this.emailVerified = true,
+    this.isAnonymous = false,
   });
 
   final String uid;
@@ -45,6 +46,10 @@ class AppUser {
   /// it, so profile-derived users default to true (they aren't used to gate the
   /// verify-email prompt — only the identity from [authStateProvider] is).
   final bool emailVerified;
+
+  /// True for a guest (anonymous) session. Sourced from the auth identity
+  /// ([mapFirebaseUser]); drives the Profile "create an account" upgrade prompt.
+  final bool isAnonymous;
 
   /// When the one-time first-run onboarding was finished. Null means the user
   /// has not completed onboarding yet — this is what the router's `/onboarding`
@@ -90,6 +95,7 @@ class AppUser {
     String? activeProgramId,
     DateTime? onboardingCompletedAt,
     bool? emailVerified,
+    bool? isAnonymous,
   }) =>
       AppUser(
         uid: uid,
@@ -103,5 +109,6 @@ class AppUser {
         onboardingCompletedAt:
             onboardingCompletedAt ?? this.onboardingCompletedAt,
         emailVerified: emailVerified ?? this.emailVerified,
+        isAnonymous: isAnonymous ?? this.isAnonymous,
       );
 }

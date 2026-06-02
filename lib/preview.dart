@@ -100,6 +100,9 @@ class _PreviewAuth implements AuthRepository {
   Future<void> signInWithGoogle() async {}
 
   @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
   Future<void> signOut() async {}
 }
 

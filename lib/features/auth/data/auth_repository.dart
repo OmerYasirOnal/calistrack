@@ -26,6 +26,9 @@ abstract interface class AuthRepository {
 
   Future<void> signInWithGoogle();
 
+  /// Sends a password-reset email (no-op visible to the user beyond the inbox).
+  Future<void> sendPasswordResetEmail(String email);
+
   Future<void> signOut();
 }
 
@@ -85,6 +88,10 @@ class FirebaseAuthRepository implements AuthRepository {
     );
     await _auth.signInWithCredential(credential);
   }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) =>
+      _auth.sendPasswordResetEmail(email: email);
 
   @override
   Future<void> signOut() async {

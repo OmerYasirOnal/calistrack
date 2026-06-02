@@ -161,8 +161,12 @@ void main() {
     expect(find.byType(OnboardingScreen), findsOneWidget);
     expect(find.text('No active program yet'), findsNothing);
 
-    // Completing onboarding stamps the profile and the gate routes to Today.
+    // Welcome → About You → Finish stamps the profile; the gate routes to Today.
     await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+    expect(find.text('About you'), findsOneWidget);
+
+    await tester.tap(find.text('Finish setup'));
     await tester.pumpAndSettle();
 
     expect(users.completeOnboardingCalls, 1);

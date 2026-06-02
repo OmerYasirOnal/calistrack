@@ -20,9 +20,18 @@ abstract interface class UserRepository {
   /// that never rewrites the rest of the profile.
   Future<void> setActiveProgram(String uid, String? programId);
 
-  /// Stamps the one-time onboarding completion — a targeted merge that never
-  /// rewrites the rest of the profile. Flips the router's `/onboarding` gate.
-  Future<void> completeOnboarding(String uid, DateTime at);
+  /// Stamps the one-time onboarding completion and persists the captured
+  /// profile answers in a single targeted merge (never rewrites the rest of the
+  /// profile). Flips the router's `/onboarding` gate. Answer fields are optional
+  /// so the same call serves both the minimal flow and the full About-You flow.
+  Future<void> completeOnboarding(
+    String uid,
+    DateTime at, {
+    ExperienceLevel? level,
+    List<String>? goals,
+    double? heightCm,
+    double? weightKg,
+  });
 }
 
 class FirestoreUserRepository implements UserRepository {
@@ -65,8 +74,22 @@ class FirestoreUserRepository implements UserRepository {
       );
 
   @override
-  Future<void> completeOnboarding(String uid, DateTime at) => _doc(uid).set(
-        {'onboardingCompletedAt': at.toIso8601String()},
+  Future<void> completeOnboarding(
+    String uid,
+    DateTime at, {
+    ExperienceLevel? level,
+    List<String>? goals,
+    double? heightCm,
+    double? weightKg,
+  }) =>
+      _doc(uid).set(
+        {
+          'onboardingCompletedAt': at.toIso8601String(),
+          if (level != null) 'level': level.name,
+          if (goals != null) 'goals': goals,
+          if (heightCm != null) 'heightCm': heightCm,
+          if (weightKg != null) 'weightKg': weightKg,
+        },
         SetOptions(merge: true),
       );
 }

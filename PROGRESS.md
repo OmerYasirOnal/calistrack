@@ -4,6 +4,25 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T26 Onboarding screens: Welcome + About You [branch feat/calistrack-m7-t26-about-you]
+- **Task:** turn the minimal onboarding into a real multi-step flow that captures
+  personalization.
+- **Added:** `OnboardingAnswers` + `OnboardingAnswersController` (level/goals/
+  daysPerWeek/equipment + optional body stats; goal/equipment options + day
+  bounds as named constants, not literals); multi-step `OnboardingScreen`
+  (progress header + shared Back/Continue footer + AnimatedSwitcher) with steps
+  **Welcome** (value prop) and **About You** (SegmentedButton level, +/- days,
+  goal/equipment FilterChips, collapsible optional height/weight). `complete()`
+  now persists level/goals/heightCm/weightKg + the flag in **one** merge write
+  (`completeOnboarding` extended). Body-stat setters reconstruct (not copyWith)
+  so an emptied field clears to null.
+- **Tests:** answers controller (toggle, clamp, clear-to-null); end-to-end
+  Welcome → About You → pick level+goals → Finish persists to the profile and
+  lands on Today; gate test updated to the 2-step nav. 79 pass, 80.9% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 79/79 pass.
+- **Deferred to T27 (per review of T25):** the initial-location flash polish folds
+  into the program/primer step rework.
+
 ## 2026-06-02 — M7 T25 Onboarding gate + state [branch feat/calistrack-m7-t25-onboarding-gate]
 - **Task:** the spine of the first-run onboarding — a router gate + completion state.
 - **Added:** `AppUser.onboardingCompletedAt` (DateTime?, ISO-8601 round-trip,

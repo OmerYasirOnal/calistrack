@@ -168,11 +168,24 @@ class FakeUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> completeOnboarding(String uid, DateTime at) async {
+  Future<void> completeOnboarding(
+    String uid,
+    DateTime at, {
+    ExperienceLevel? level,
+    List<String>? goals,
+    double? heightCm,
+    double? weightKg,
+  }) async {
     completeOnboardingCalls++;
     final base =
         store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
-    store[uid] = base.copyWith(onboardingCompletedAt: at);
+    store[uid] = base.copyWith(
+      onboardingCompletedAt: at,
+      level: level,
+      goals: goals,
+      heightCm: heightCm,
+      weightKg: weightKg,
+    );
     _emit(uid);
   }
 }

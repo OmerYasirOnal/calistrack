@@ -181,21 +181,36 @@ class _ReminderCardState extends ConsumerState<_ReminderCard> {
 
   Future<void> _persist({required bool enabled, required int? minutes}) async {
     final messenger = ScaffoldMessenger.of(context);
+    final uid = widget.profile.uid;
+    final users = ref.read(userRepositoryProvider);
     setState(() => _busy = true);
     try {
-      await ref.read(userRepositoryProvider).setReminder(
-            widget.profile.uid,
-            enabled: enabled,
-            minutes: minutes,
-          );
-      // Device scheduling is best-effort: persistence is the source of truth,
-      // and the service is a no-op on web/test.
+      // Persist the intent first (the profile doc is the source of truth that
+      // renders the switch), then schedule on the device.
+      await users.setReminder(uid, enabled: enabled, minutes: minutes);
+      var scheduled = true;
       try {
-        await ref.read(notificationServiceProvider).applyReminder(
-              enabled: enabled,
-              minutes: minutes,
-            );
-      } catch (_) {/* scheduling is best-effort */}
+        scheduled = await ref
+            .read(notificationServiceProvider)
+            .applyReminder(enabled: enabled, minutes: minutes);
+      } catch (_) {
+        // A thrown failure while enabling counts as "not scheduled".
+        scheduled = !enabled;
+      }
+      if (enabled && !scheduled) {
+        // The OS notification permission was denied — roll the toggle back so it
+        // doesn't lie (showing "on" while nothing fires) and explain why.
+        await users.setReminder(uid, enabled: false, minutes: minutes);
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Enable notifications in Settings to get reminders.',
+              ),
+            ),
+          );
+      }
     } catch (_) {
       messenger
         ..hideCurrentSnackBar()

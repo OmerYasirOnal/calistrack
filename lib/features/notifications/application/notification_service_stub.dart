@@ -17,5 +17,6 @@ class NoOpNotificationService implements NotificationService {
   Future<void> initialize() async {}
 
   @override
-  Future<void> applyReminder({required bool enabled, int? minutes}) async {}
+  Future<bool> applyReminder({required bool enabled, int? minutes}) async =>
+      true;
 }

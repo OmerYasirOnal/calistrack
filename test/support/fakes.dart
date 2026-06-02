@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:calistrack/features/auth/data/auth_repository.dart';
+import 'package:calistrack/features/notifications/application/notification_service.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/programs/data/user_program_repository.dart';
 import 'package:calistrack/features/skills/data/skill_repository.dart';
@@ -271,6 +272,33 @@ class FakeUserRepository implements UserRepository {
   }) async {
     setReminderCalls++;
     _merge(uid, {'reminderEnabled': enabled, 'reminderMinutes': minutes});
+  }
+}
+
+/// Recording [NotificationService] for tests. Captures every `applyReminder`
+/// call and reports a configurable scheduling result (so the denied-permission
+/// path can be exercised).
+class FakeNotificationService implements NotificationService {
+  FakeNotificationService({this.supported = true, this.scheduleResult = true});
+
+  /// What [applyReminder] returns when enabling — `false` simulates a denied OS
+  /// permission.
+  bool scheduleResult;
+  final bool supported;
+  final List<({bool enabled, int? minutes})> applied = [];
+  int initializeCalls = 0;
+
+  @override
+  bool get isSupported => supported;
+
+  @override
+  Future<void> initialize() async => initializeCalls++;
+
+  @override
+  Future<bool> applyReminder({required bool enabled, int? minutes}) async {
+    applied.add((enabled: enabled, minutes: minutes));
+    // Turning off always "succeeds"; only enabling can be denied.
+    return !enabled || scheduleResult;
   }
 }
 

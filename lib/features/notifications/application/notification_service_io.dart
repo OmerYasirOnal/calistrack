@@ -54,15 +54,19 @@ class LocalNotificationService implements NotificationService {
   }
 
   @override
-  Future<void> applyReminder({required bool enabled, int? minutes}) async {
-    if (!isSupported) return;
+  Future<bool> applyReminder({required bool enabled, int? minutes}) async {
+    // No device reminders here (desktop / test VM) — nothing to fail.
+    if (!isSupported) return true;
     await initialize();
     // Always clear the existing schedule first so toggling off / changing the
     // time never leaves a stale notification — mirrors the single-reminder
     // model and makes this idempotent.
     await _plugin.cancel(id: _reminderId);
-    if (!enabled || minutes == null) return;
-    if (!await _ensurePermission()) return;
+    // Turning off (or no time set) is a success: the desired state is achieved.
+    if (!enabled || minutes == null) return true;
+    // Enabling but the OS permission was denied — report failure so the caller
+    // can keep the toggle honest rather than showing "on" while nothing fires.
+    if (!await _ensurePermission()) return false;
 
     final when = tz.TZDateTime.from(
       nextReminderInstance(minutes, DateTime.now()),
@@ -87,6 +91,7 @@ class LocalNotificationService implements NotificationService {
       // Repeat every day at the same wall-clock time.
       matchDateTimeComponents: DateTimeComponents.time,
     );
+    return true;
   }
 
   /// Requests the OS notification permission, returning whether it's granted.

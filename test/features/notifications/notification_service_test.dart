@@ -51,12 +51,18 @@ void main() {
   });
 
   group('NoOpNotificationService', () {
-    test('is unsupported and every method is a safe no-op', () async {
+    test('is unsupported and applyReminder reports success (nothing to fail)',
+        () async {
       const service = NoOpNotificationService();
       expect(service.isSupported, false);
       await service.initialize();
-      await service.applyReminder(enabled: true, minutes: 480);
-      await service.applyReminder(enabled: false, minutes: null);
+      // No device reminders here, so enabling/disabling both "succeed" — the
+      // UI must not show a misleading permission error on web/test.
+      expect(await service.applyReminder(enabled: true, minutes: 480), isTrue);
+      expect(
+        await service.applyReminder(enabled: false, minutes: null),
+        isTrue,
+      );
     });
   });
 }

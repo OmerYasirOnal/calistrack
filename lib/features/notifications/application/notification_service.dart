@@ -48,9 +48,15 @@ abstract interface class NotificationService {
   /// Cancel-then-(re)schedule the one daily reminder. Cancels when [enabled] is
   /// false or [minutes] is null; otherwise requests permission (if needed) and
   /// schedules a daily notification at [minutes] past local midnight. Idempotent
-  /// — safe to call on every profile change / app launch. No-op when
-  /// unsupported.
-  Future<void> applyReminder({required bool enabled, int? minutes});
+  /// — safe to call on every profile change / app launch.
+  ///
+  /// Returns whether the requested state was achieved: `true` when the reminder
+  /// was scheduled, when it was turned off, or when the platform has no device
+  /// reminders (web/test — nothing to fail). Returns `false` only when enabling
+  /// on a supported platform but the OS notification permission was denied, so
+  /// callers can keep the toggle honest instead of showing "on" while nothing
+  /// fires.
+  Future<bool> applyReminder({required bool enabled, int? minutes});
 }
 
 /// The active [NotificationService] — real on mobile, no-op elsewhere.

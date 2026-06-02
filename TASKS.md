@@ -71,7 +71,7 @@ Each task links to its GitHub issue once created.
 | T26 | Onboarding screens: Welcome + About You | REVIEW | #21 | — |
 | T27 | Onboarding: recommended program + primer; funnel fix | REVIEW | #21 | — |
 | T28 | Exercise coaching content (cues; name everywhere) | REVIEW | #21 | — |
-| T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | TODO | #21 | — |
+| T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | REVIEW | #21 | — |
 | T30 | android/ios platforms + google_mobile_ads + AdMob IDs | TODO | #21 | — |
 | T31 | AdService (web no-op) + banner + interstitial (freq-capped) | TODO | #21 | — |
 

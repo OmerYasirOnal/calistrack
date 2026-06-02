@@ -19,14 +19,57 @@ class SkillsScreen extends ConsumerWidget {
       body: skills.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text("Couldn't load skills.")),
-        data: (list) => ListView.separated(
-          padding: const EdgeInsets.all(Spacing.md),
-          itemCount: list.length,
-          separatorBuilder: (_, __) => const SizedBox(height: Spacing.md),
-          itemBuilder: (_, i) => _SkillCard(
-            skill: list[i],
-            onTap: () => context.push(Routes.skillDetail(list[i].id)),
-          ),
+        data: (list) {
+          // Show an intro until the user has advanced any skill — then it
+          // disappears on its own (no manual dismiss to remember).
+          final noProgress =
+              list.isNotEmpty && list.every((s) => s.currentStepIndex == 0);
+          return ListView(
+            padding: const EdgeInsets.all(Spacing.md),
+            children: [
+              if (noProgress) ...[
+                const _SkillsIntro(),
+                const SizedBox(height: Spacing.md),
+              ],
+              for (final skill in list) ...[
+                _SkillCard(
+                  skill: skill,
+                  onTap: () => context.push(Routes.skillDetail(skill.id)),
+                ),
+                const SizedBox(height: Spacing.md),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// One-time intro shown on the Skills tab before any progress is recorded.
+class _SkillsIntro extends StatelessWidget {
+  const _SkillsIntro();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Card(
+      color: scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Row(
+          children: [
+            Icon(Icons.emoji_events_outlined, color: scheme.primary),
+            const SizedBox(width: Spacing.md),
+            Expanded(
+              child: Text(
+                'Work toward these skills over time — open any one to log '
+                'attempts and advance through its steps.',
+                style: text.bodyMedium,
+              ),
+            ),
+          ],
         ),
       ),
     );

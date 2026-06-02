@@ -41,6 +41,12 @@ class _SummaryDialog extends StatelessWidget {
             label: 'Volume',
             value: workout.totalVolume.toStringAsFixed(0),
           ),
+          const SizedBox(height: Spacing.md),
+          Text(
+            'Your Progress charts and skill streaks just updated.',
+            textAlign: TextAlign.center,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
         ],
       ),
       actions: [

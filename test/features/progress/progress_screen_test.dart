@@ -57,6 +57,8 @@ void main() {
       find.textContaining('Log a few workouts'),
       findsOneWidget,
     );
+    // ...with a CTA that funnels the user to Today.
+    expect(find.text('Log your first workout'), findsOneWidget);
   });
 
   testWidgets('renders stats + chart for an exercise with history',

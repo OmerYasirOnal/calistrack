@@ -58,6 +58,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Front Lever'), findsOneWidget);
     expect(find.text('Pistol Squat'), findsOneWidget);
+    // No progress yet → the intro is shown.
+    expect(find.textContaining('Work toward these skills'), findsOneWidget);
 
     // Open a skill → step ladder.
     await tester.tap(find.text('Front Lever'));

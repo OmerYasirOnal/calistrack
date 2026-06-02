@@ -2,7 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/exercise.dart';
 import '../../exercises/data/exercise_repository.dart';
@@ -171,6 +173,12 @@ class _EmptyProgress extends StatelessWidget {
             'Log a few workouts and your progress charts will appear here.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: Spacing.lg),
+          FilledButton.icon(
+            onPressed: () => context.go(Routes.today),
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('Log your first workout'),
           ),
         ],
       ),

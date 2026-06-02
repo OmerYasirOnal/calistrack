@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../models/app_user.dart';
+import '../../auth/data/auth_repository.dart';
 import '../../onboarding/application/onboarding_answers.dart';
 import '../data/user_repository.dart';
 
@@ -48,14 +49,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final navigator = Navigator.of(context);
     setState(() => _saving = true);
     try {
+      final name = _name.text.trim();
       await ref.read(userRepositoryProvider).updateDetails(
             widget.profile.uid,
-            displayName: _name.text.trim(),
+            displayName: name,
             level: _level,
             goals: _goals.toList(),
             heightCm: double.tryParse(_height.text.trim()),
             weightKg: double.tryParse(_weight.text.trim()),
           );
+      // Keep the auth identity's display name in sync (best-effort — the
+      // profile doc is the display source, so a failure here mustn't block).
+      try {
+        await ref.read(authRepositoryProvider).updateDisplayName(name);
+      } catch (_) {/* non-critical */}
       navigator.pop();
       messenger
         ..hideCurrentSnackBar()

@@ -136,6 +136,15 @@ class FakeAuthRepository implements AuthRepository {
     if (errorToThrow != null) throw errorToThrow!;
   }
 
+  int updateNameCalls = 0;
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    updateNameCalls++;
+    if (errorToThrow != null) throw errorToThrow!;
+    if (_current != null) _set(_current!.copyWith(displayName: displayName));
+  }
+
   @override
   Future<void> signOut() async {
     signOutCalls++;

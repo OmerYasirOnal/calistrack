@@ -43,11 +43,18 @@ abstract interface class AuthRepository {
   /// Sends a verification email to the currently signed-in user (no-op if none).
   Future<void> sendEmailVerification();
 
+  /// Updates the auth identity's display name, keeping it in sync with the
+  /// Firestore profile (no-op if signed out).
+  Future<void> updateDisplayName(String displayName);
+
   Future<void> signOut();
 }
 
-/// Maps a Firebase [User] to the app's [AppUser]. Profile fields beyond the
-/// auth identity live in Firestore (see `UserRepository`).
+/// Maps a Firebase [User] to the app's [AppUser] — the auth *identity* only
+/// (uid/email/displayName/emailVerified/isAnonymous). It is NOT the source of
+/// truth for level/goals/body-stats (those live in the Firestore profile, read
+/// via `currentUserProfileProvider`); those fields keep their model defaults
+/// here, so never read them off `authStateProvider`.
 AppUser? mapFirebaseUser(User? user) => user == null
     ? null
     : AppUser(
@@ -139,6 +146,11 @@ class FirebaseAuthRepository implements AuthRepository {
     if (user != null && !user.emailVerified) {
       await user.sendEmailVerification();
     }
+  }
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    await _auth.currentUser?.updateDisplayName(displayName);
   }
 
   @override

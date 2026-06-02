@@ -116,6 +116,9 @@ class _PreviewAuth implements AuthRepository {
   Future<void> sendEmailVerification() async {}
 
   @override
+  Future<void> updateDisplayName(String displayName) async {}
+
+  @override
   Future<void> signOut() async {}
 }
 

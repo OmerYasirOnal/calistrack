@@ -29,9 +29,11 @@ void main() {
       ),
     );
 
-    // First frame while auth is still loading: splash, not Today.
+    // First frame while auth is still loading: branded splash, not Today.
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('CalisTrack'), findsOneWidget);
+    expect(find.text('Master bodyweight strength'), findsOneWidget);
     expect(find.text('No active program yet'), findsNothing);
 
     // After auth resolves, the gated router lands on Today (empty state here).

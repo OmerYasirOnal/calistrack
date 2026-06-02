@@ -43,6 +43,8 @@ void main() {
     await tester.tap(find.text('Classic PPL'));
     await tester.pumpAndSettle();
     expect(find.text('Push-up'), findsOneWidget); // a Push-day movement
+    // Each movement shows its coaching cue as a subtitle.
+    expect(find.textContaining('Hands under shoulders'), findsOneWidget);
     expect(find.text('Set as active program'), findsOneWidget);
 
     // Setting it active persists to the profile and flips the footer.

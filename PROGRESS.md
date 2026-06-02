@@ -4,6 +4,22 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T28 Exercise coaching content [branch feat/calistrack-m7-t28-coaching]
+- **Task:** make movements coachable, not just named.
+- **Added:** rewrote all 19 `exercises.json` descriptions from terse labels
+  ("Horizontal push.") into genuine one-line form cues ("Hands under shoulders,
+  body in one straight line — lower until elbows reach about 90°…"). New derived
+  `exerciseCuesProvider` (id → cue). Cues now surface on the **learning** surfaces:
+  the program-detail movement list (subtitle) and the onboarding **first-session
+  primer** (under each movement). Confirmed names already resolve everywhere (no
+  raw ids leak — the audit's claim was largely off).
+- **Decision:** kept the **Today logger compact** (no cue clutter on the active-
+  training card) — cues live on the inspect/learn surfaces. Avoids cluttering the
+  log loop and the layout-fragile logger tests.
+- **Tests:** program-detail cue assertion added; primer cue exercised by the flow
+  test. 83 pass, 81.8% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 83/83 pass.
+
 ## 2026-06-02 — M7 T27 Onboarding: recommended program + primer (straight line to first set) [branch feat/calistrack-m7-t27-program-primer]
 - **Task:** finish the onboarding spine — recommend a program and drop the user
   straight into their first session.

@@ -21,6 +21,7 @@ const _library = [
     name: 'Push-up',
     muscleGroup: MuscleGroup.push,
     type: ExerciseType.reps,
+    description: 'Hands under shoulders, body in one straight line.',
   ),
 ];
 
@@ -120,8 +121,9 @@ void main() {
     await tester.tap(find.text('Start this program'));
     await tester.pumpAndSettle();
 
-    // Primer.
+    // Primer — shows the first session's movements with their coaching cue.
     expect(find.text("You're all set!"), findsOneWidget);
+    expect(find.textContaining('Hands under shoulders'), findsOneWidget);
     await tester.tap(find.text('Start training'));
     await tester.pumpAndSettle();
 

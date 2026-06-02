@@ -88,11 +88,11 @@ Each task links to its GitHub issue once created.
 |------|-------|--------|-------|----|
 | T36 | Profile shows saved details + Edit screen (name/level/goals/body stats) | DONE | #33 | #34 |
 
-## M10 — Verification-audit fixes  🚧 (issue #35)
+## M10 — Verification-audit fixes  ✅ (complete; issue #35 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
-| T37 | Coaching cues on the logging card (+ scroll-robust Today tests) | DONE | #35 | — |
-| T38 | GDPR/UMP consent + iOS ATT in ad init | TODO | #35 | — |
+| T37 | Coaching cues on the logging card (+ scroll-robust Today tests) | DONE | #35 | #36 |
+| T38 | GDPR/UMP consent + iOS ATT in ad init | DONE | #35 | — |
 
 ---
 

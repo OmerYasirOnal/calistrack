@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -24,10 +26,41 @@ class MobileAdService implements AdService {
   @override
   Future<void> initialize() async {
     if (!isSupported) return;
+    // 1. iOS App Tracking Transparency prompt (no-op on Android / if already
+    //    decided). Owner must finalise the Info.plist copy + verify on-device.
+    if (Platform.isIOS) {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    }
+    // 2. GDPR/UMP consent (Google User Messaging Platform, bundled in
+    //    google_mobile_ads). Gathers consent / shows the form where the user's
+    //    region requires it, before any ad loads. Owner configures the consent
+    //    form in the AdMob console + verifies on-device.
+    await _gatherConsent();
+    // 3. Now safe to initialize the ads SDK.
     await MobileAds.instance.initialize();
-    // TODO(owner): before release, request iOS App Tracking Transparency
-    // (NSUserTrackingUsageDescription is already in Info.plist) and show a
-    // GDPR/UMP consent form via the user_messaging_platform plugin.
+  }
+
+  /// Requests a consent-info update and shows the consent form if required.
+  /// Always completes (proceeding non-personalized on failure) and is
+  /// time-boxed so a slow/blocked consent flow never hangs app startup.
+  Future<void> _gatherConsent() {
+    final completer = Completer<void>();
+    void done() {
+      if (!completer.isCompleted) completer.complete();
+    }
+
+    ConsentInformation.instance.requestConsentInfoUpdate(
+      ConsentRequestParameters(),
+      () => unawaited(
+        ConsentForm.loadAndShowConsentFormIfRequired((_) => done()),
+      ),
+      (_) => done(),
+    );
+    return completer.future
+        .timeout(const Duration(seconds: 10), onTimeout: () {});
   }
 
   @override

@@ -126,9 +126,22 @@ class _PreviewUsers implements UserRepository {
   }
 
   @override
-  Future<void> completeOnboarding(String uid, DateTime at) async {
+  Future<void> completeOnboarding(
+    String uid,
+    DateTime at, {
+    ExperienceLevel? level,
+    List<String>? goals,
+    double? heightCm,
+    double? weightKg,
+  }) async {
     final base = _store[uid] ?? _demoUser;
-    _store[uid] = base.copyWith(onboardingCompletedAt: at);
+    _store[uid] = base.copyWith(
+      onboardingCompletedAt: at,
+      level: level,
+      goals: goals,
+      heightCm: heightCm,
+      weightKg: weightKg,
+    );
   }
 }
 

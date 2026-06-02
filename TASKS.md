@@ -68,7 +68,7 @@ Each task links to its GitHub issue once created.
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
 | T25 | Onboarding gate + state (`onboardingCompletedAt`, router, controller) | REVIEW | #21 | — |
-| T26 | Onboarding screens: Welcome + About You | TODO | #21 | — |
+| T26 | Onboarding screens: Welcome + About You | REVIEW | #21 | — |
 | T27 | Onboarding: recommended program + primer; funnel fix | TODO | #21 | — |
 | T28 | Exercise coaching content (cues; name everywhere) | TODO | #21 | — |
 | T29 | Guidance polish (Progress CTA, Skills banner, session celebration) | TODO | #21 | — |

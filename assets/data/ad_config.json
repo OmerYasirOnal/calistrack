@@ -1,0 +1,24 @@
+{
+  "_comment": "AdMob ad-unit IDs and pacing. The `test` block uses Google's official public sample units (safe to ship in debug). TODO(owner): replace every value in `prod` with your real AdMob ad-unit IDs before a release build, and swap the App IDs in android/app/src/main/AndroidManifest.xml and ios/Runner/Info.plist.",
+  "test": {
+    "android": {
+      "banner": "ca-app-pub-3940256099942544/6300978111",
+      "interstitial": "ca-app-pub-3940256099942544/1033173712"
+    },
+    "ios": {
+      "banner": "ca-app-pub-3940256099942544/2934735716",
+      "interstitial": "ca-app-pub-3940256099942544/4411468910"
+    }
+  },
+  "prod": {
+    "android": {
+      "banner": "TODO_REPLACE_WITH_REAL_ANDROID_BANNER_UNIT",
+      "interstitial": "TODO_REPLACE_WITH_REAL_ANDROID_INTERSTITIAL_UNIT"
+    },
+    "ios": {
+      "banner": "TODO_REPLACE_WITH_REAL_IOS_BANNER_UNIT",
+      "interstitial": "TODO_REPLACE_WITH_REAL_IOS_INTERSTITIAL_UNIT"
+    }
+  },
+  "interstitialEverySessions": 3
+}

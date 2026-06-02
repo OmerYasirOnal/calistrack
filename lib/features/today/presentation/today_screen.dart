@@ -93,8 +93,15 @@ class _ActiveDayState extends ConsumerState<_ActiveDay> {
       if (workout != null) {
         await showSessionSummary(context, workout);
         // Count this session and maybe show an interstitial (capped; no-op on
-        // web/desktop/tests). Never blocks the training flow.
-        await ref.read(adServiceProvider).maybeShowInterstitial();
+        // web/desktop/tests). Its own try so an ad failure never masquerades as
+        // a save failure — the session is already persisted by this point.
+        if (mounted) {
+          try {
+            await ref.read(adServiceProvider).maybeShowInterstitial();
+          } catch (e) {
+            debugPrint('Interstitial failed to show: $e');
+          }
+        }
       }
     } catch (_) {
       if (mounted) {

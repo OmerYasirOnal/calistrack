@@ -75,13 +75,18 @@ Each task links to its GitHub issue once created.
 | T30 | android/ios platforms + google_mobile_ads + AdMob IDs | DONE | #21 | (PR #26 bundle) |
 | T31 | AdService (web no-op) + banner + interstitial (freq-capped) | DONE | #21 | #27 |
 
-## M8 — Account recovery + launch polish  🚧 (issue #28)
+## M8 — Account recovery + launch polish  ✅ (complete; issue #28 closed)
 | Task | Title | Status | Issue | PR |
 |------|-------|--------|-------|----|
 | T32 | "Forgot password?" + reset dialog (sendPasswordResetEmail) | DONE | #28 | #29 |
 | T33 | Email verification (send on register + Profile resend) | DONE | #28 | #30 |
 | T34 | Branded splash (logo + name + tagline) | DONE | #28 | #31 |
-| T35 | Guest / "try without an account" (anonymous + link-on-register) | REVIEW | #28 | — |
+| T35 | Guest / "try without an account" (anonymous + link-on-register) | DONE | #28 | #32 |
+
+## M9 — Profile editing  🚧 (issue #33)
+| Task | Title | Status | Issue | PR |
+|------|-------|--------|-------|----|
+| T36 | Profile shows saved details + Edit screen (name/level/goals/body stats) | REVIEW | #33 | — |
 
 ---
 

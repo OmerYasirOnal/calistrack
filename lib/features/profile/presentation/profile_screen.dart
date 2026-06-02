@@ -4,29 +4,53 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../models/app_user.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/data/auth_repository.dart';
+import '../application/profile_providers.dart';
+import 'edit_profile_screen.dart';
 
-/// Profile & settings. M2 delivers identity + sign-out; body metrics, level,
-/// and goals editing arrive with the profile-editing work later.
+/// Profile & settings — identity, the saved details (level/goals/body stats),
+/// account state (guest/verify), editing, and sign-out.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(authStateProvider);
+    // Auth identity carries email / isAnonymous / emailVerified; the Firestore
+    // profile doc carries the editable details (name / level / goals / stats).
+    final identityAsync = ref.watch(authStateProvider);
+    final profile = ref.watch(currentUserProfileProvider).valueOrNull;
     final signingOut = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: userAsync.when(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          if (profile != null)
+            IconButton(
+              tooltip: 'Edit profile',
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => EditProfileScreen(profile: profile),
+                ),
+              ),
+            ),
+        ],
+      ),
+      body: identityAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Could not load profile: $e')),
-        data: (user) {
-          if (user == null) {
+        data: (identity) {
+          if (identity == null) {
             return const Center(child: Text('Not signed in.'));
           }
-          final name = user.displayName.isEmpty ? 'Athlete' : user.displayName;
+          // Prefer the profile doc for editable fields; fall back to the auth
+          // identity until the doc resolves.
+          final p = profile ?? identity;
+          final name = p.displayName.isEmpty ? 'Athlete' : p.displayName;
+          final text = Theme.of(context).textTheme;
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
             children: [
@@ -47,16 +71,11 @@ class ProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              name,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            Text(
-                              user.email,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
+                            Text(name, style: text.titleLarge),
+                            if (identity.email.isNotEmpty)
+                              Text(identity.email, style: text.bodyMedium),
                             const SizedBox(height: Spacing.xs),
-                            Chip(label: Text(user.level.label)),
+                            Chip(label: Text(p.level.label)),
                           ],
                         ),
                       ),
@@ -64,10 +83,16 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (user.isAnonymous) ...[
+              if (p.goals.isNotEmpty ||
+                  p.heightCm != null ||
+                  p.weightKg != null) ...[
+                const SizedBox(height: Spacing.md),
+                _DetailsCard(profile: p),
+              ],
+              if (identity.isAnonymous) ...[
                 const SizedBox(height: Spacing.md),
                 const _GuestUpgradeCard(),
-              ] else if (!user.emailVerified) ...[
+              ] else if (!identity.emailVerified) ...[
                 const SizedBox(height: Spacing.md),
                 const _VerifyEmailCard(),
               ],
@@ -85,6 +110,53 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Shows the user's goals + body stats (whatever they've set).
+class _DetailsCard extends StatelessWidget {
+  const _DetailsCard({required this.profile});
+
+  final AppUser profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final stats = <String>[
+      if (profile.heightCm != null) '${_fmt(profile.heightCm!)} cm',
+      if (profile.weightKg != null) '${_fmt(profile.weightKg!)} kg',
+    ];
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (profile.goals.isNotEmpty) ...[
+              Text('Goals', style: text.titleSmall),
+              const SizedBox(height: Spacing.sm),
+              Wrap(
+                spacing: Spacing.sm,
+                children: [
+                  for (final g in profile.goals) Chip(label: Text(g)),
+                ],
+              ),
+            ],
+            if (stats.isNotEmpty) ...[
+              if (profile.goals.isNotEmpty) const SizedBox(height: Spacing.md),
+              Text(
+                stats.join(' · '),
+                style: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _fmt(double v) =>
+      v == v.roundToDouble() ? v.toInt().toString() : v.toString();
 }
 
 /// Shown on Profile for a guest (anonymous) session — invites creating a real

@@ -136,6 +136,15 @@ class FakeAuthRepository implements AuthRepository {
     if (errorToThrow != null) throw errorToThrow!;
   }
 
+  int updateNameCalls = 0;
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    updateNameCalls++;
+    if (errorToThrow != null) throw errorToThrow!;
+    if (_current != null) _set(_current!.copyWith(displayName: displayName));
+  }
+
   @override
   Future<void> signOut() async {
     signOutCalls++;
@@ -229,6 +238,37 @@ class FakeUserRepository implements UserRepository {
       goals: goals,
       heightCm: heightCm,
       weightKg: weightKg,
+    );
+    _emit(uid);
+  }
+
+  int updateDetailsCalls = 0;
+
+  @override
+  Future<void> updateDetails(
+    String uid, {
+    required String displayName,
+    required ExperienceLevel level,
+    required List<String> goals,
+    double? heightCm,
+    double? weightKg,
+  }) async {
+    updateDetailsCalls++;
+    final base =
+        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
+    // Reconstructed (not copyWith) so null height/weight truly clears.
+    store[uid] = AppUser(
+      uid: base.uid,
+      email: base.email,
+      displayName: displayName,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      level: level,
+      goals: goals,
+      activeProgramId: base.activeProgramId,
+      onboardingCompletedAt: base.onboardingCompletedAt,
+      emailVerified: base.emailVerified,
+      isAnonymous: base.isAnonymous,
     );
     _emit(uid);
   }

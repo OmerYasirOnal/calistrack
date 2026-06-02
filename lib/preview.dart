@@ -116,6 +116,9 @@ class _PreviewAuth implements AuthRepository {
   Future<void> sendEmailVerification() async {}
 
   @override
+  Future<void> updateDisplayName(String displayName) async {}
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -157,6 +160,29 @@ class _PreviewUsers implements UserRepository {
       goals: goals,
       heightCm: heightCm,
       weightKg: weightKg,
+    );
+  }
+
+  @override
+  Future<void> updateDetails(
+    String uid, {
+    required String displayName,
+    required ExperienceLevel level,
+    required List<String> goals,
+    double? heightCm,
+    double? weightKg,
+  }) async {
+    final base = _store[uid] ?? _demoUser;
+    _store[uid] = AppUser(
+      uid: base.uid,
+      email: base.email,
+      displayName: displayName,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      level: level,
+      goals: goals,
+      activeProgramId: base.activeProgramId,
+      onboardingCompletedAt: base.onboardingCompletedAt,
     );
   }
 }

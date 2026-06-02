@@ -3,6 +3,7 @@ import 'package:calistrack/features/auth/data/auth_repository.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/skills/data/skill_repository.dart';
 import 'package:calistrack/features/skills/presentation/skill_detail_screen.dart';
+import 'package:calistrack/features/skills/presentation/skills_screen.dart';
 import 'package:calistrack/models/app_user.dart';
 import 'package:calistrack/models/skill_progress.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Front Lever'), findsOneWidget);
     expect(find.text('Pistol Squat'), findsOneWidget);
+    // No progress yet → the intro is shown.
+    expect(find.textContaining('Work toward these skills'), findsOneWidget);
 
     // Open a skill → step ladder.
     await tester.tap(find.text('Front Lever'));
@@ -127,5 +130,32 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Skill not found.'), findsOneWidget);
+  });
+
+  testWidgets('the intro is hidden once a skill has progress', (tester) async {
+    final auth = FakeAuthRepository(
+      initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+    );
+    final skills = FakeSkillRepository(_presets)
+      ..saved['front_lever'] = (currentStepIndex: 1, logs: const []);
+    addTearDown(() {
+      auth.dispose();
+      skills.dispose();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          skillRepositoryProvider.overrideWithValue(skills),
+        ],
+        child: const MaterialApp(home: SkillsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Front Lever'), findsOneWidget);
+    // A skill has advanced → the intro auto-hides.
+    expect(find.textContaining('Work toward these skills'), findsNothing);
   });
 }

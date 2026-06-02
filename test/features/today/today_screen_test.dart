@@ -101,6 +101,8 @@ void main() {
     await tester.tap(find.text('Finish session'));
     await tester.pumpAndSettle();
     expect(find.text('Session complete'), findsOneWidget);
+    // The summary nudges toward Progress + Skills.
+    expect(find.textContaining('Progress charts'), findsOneWidget);
     expect(workouts.saved, hasLength(1));
 
     await tester.tap(find.text('Done'));

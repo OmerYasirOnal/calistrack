@@ -4,6 +4,16 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M7 T29 Guidance polish [branch feat/calistrack-m7-t29-guidance]
+- **Task:** funnel + educate at the empty/idle moments.
+- **Added:** Progress empty-state CTA "Log your first workout" → Today; a
+  context-aware Skills intro banner that auto-hides once any skill advances
+  (no manual-dismiss state to persist); a Progress/skills nudge line on the
+  session-complete summary.
+- **Tests:** Progress CTA, Skills intro shown when no progress, session-summary
+  nudge. 83 pass, 82.2% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 83/83 pass.
+
 ## 2026-06-02 — M7 T28 Exercise coaching content [branch feat/calistrack-m7-t28-coaching]
 - **Task:** make movements coachable, not just named.
 - **Added:** rewrote all 19 `exercises.json` descriptions from terse labels

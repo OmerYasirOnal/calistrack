@@ -4,6 +4,13 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M8 T34 Branded splash [branch feat/calistrack-m8-t34-splash]
+- **Task:** replace the bare cold-start spinner with a branded splash (audit major).
+- **Added:** `_SplashScreen` (dumbbell logo + "CalisTrack" wordmark + "Master
+  bodyweight strength" tagline + spinner) shown while the first auth state
+  resolves; splash-gate test asserts the branding. 96 tests.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean.
+
 ## 2026-06-02 — M8 T33 Email verification [branch feat/calistrack-m8-t33-email-verification]
 - **Task:** verify emails (audit major) — send on sign-up + let users resend.
 - **Added:** `AuthRepository.sendEmailVerification` (Firebase impl guards on

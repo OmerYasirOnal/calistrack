@@ -24,9 +24,7 @@ class CalisTrackApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
         themeMode: ThemeMode.dark,
-        home: const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        home: const _SplashScreen(),
       );
     }
 
@@ -37,6 +35,46 @@ class CalisTrackApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
       routerConfig: ref.watch(goRouterProvider),
+    );
+  }
+}
+
+/// Branded splash shown while the first auth state resolves — a logo + wordmark
+/// instead of a bare spinner, so the cold start looks intentional.
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.fitness_center, size: 72, color: scheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              'CalisTrack',
+              style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Master bodyweight strength',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 32),
+            const SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

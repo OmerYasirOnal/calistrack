@@ -64,14 +64,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ref.read(onboardingControllerProvider.notifier).complete();
 
   /// Start the first training day's session, then complete onboarding so the
-  /// user lands on Today already in their first session.
-  void _startTraining() {
+  /// user lands on Today already in their first session. If completion fails,
+  /// cancel the just-started session so we don't leave a live session behind a
+  /// still-locked onboarding gate.
+  Future<void> _startTraining() async {
     final program = _chosen;
     final firstDay = program?.days.firstWhereOrNull((d) => !d.isRest);
+    final session = ref.read(workoutSessionProvider.notifier);
     if (program != null && firstDay != null) {
-      ref.read(workoutSessionProvider.notifier).startDay(program, firstDay);
+      session.startDay(program, firstDay);
     }
-    ref.read(onboardingControllerProvider.notifier).complete();
+    // complete() uses AsyncValue.guard, so it resolves (never throws) — check
+    // the resulting state for failure.
+    await ref.read(onboardingControllerProvider.notifier).complete();
+    if (!mounted) return;
+    if (ref.read(onboardingControllerProvider).hasError) {
+      session.cancel();
+    }
   }
 
   @override
@@ -373,7 +382,7 @@ class _ProgramStepState extends ConsumerState<_ProgramStep> {
     final state = ref.watch(aiGenerationControllerProvider);
 
     if (state.isLoading || state.valueOrNull == null) {
-      return const Center(child: _Building());
+      return Center(child: _Building(onSkip: widget.onSkipToManual));
     }
     if (state.hasError) {
       return Center(
@@ -404,6 +413,18 @@ class _ProgramStepState extends ConsumerState<_ProgramStep> {
           style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: Spacing.sm),
+        if (result.usedFallback) ...[
+          Card(
+            color: scheme.surfaceContainerHighest,
+            child: const Padding(
+              padding: EdgeInsets.all(Spacing.md),
+              child: Text(
+                'Built from a matching template (AI service not connected yet).',
+              ),
+            ),
+          ),
+          const SizedBox(height: Spacing.sm),
+        ],
         Card(
           child: Padding(
             padding: const EdgeInsets.all(Spacing.md),
@@ -457,7 +478,9 @@ class _ProgramStepState extends ConsumerState<_ProgramStep> {
 }
 
 class _Building extends StatelessWidget {
-  const _Building();
+  const _Building({required this.onSkip});
+
+  final VoidCallback? onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -470,6 +493,10 @@ class _Building extends StatelessWidget {
           'Building your program…',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
+        if (onSkip != null) ...[
+          const SizedBox(height: Spacing.md),
+          TextButton(onPressed: onSkip, child: const Text('Pick one myself')),
+        ],
       ],
     );
   }

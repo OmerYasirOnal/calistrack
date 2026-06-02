@@ -146,11 +146,17 @@ Program fallbackProgram(GenerationRequest request, List<Program> presets) {
   );
 }
 
+/// How long to wait on the Cloud Function before giving up. A TimeoutException
+/// is an [Exception], so [AiProgramService.generate] degrades a hung/slow call
+/// into the deterministic local fallback rather than spinning forever.
+const _functionTimeout = Duration(seconds: 20);
+
 Future<Map<String, dynamic>> _callFunction(
   Map<String, dynamic> request,
 ) async {
   final callable = FirebaseFunctions.instance.httpsCallable('generateProgram');
-  final result = await callable.call<Object?>(request);
+  final result =
+      await callable.call<Object?>(request).timeout(_functionTimeout);
   return Map<String, dynamic>.from(result.data as Map);
 }
 

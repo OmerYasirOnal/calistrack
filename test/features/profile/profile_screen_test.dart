@@ -48,4 +48,19 @@ void main() {
 
     expect(find.text('Verify your email'), findsNothing);
   });
+
+  testWidgets('a guest sees the upgrade card, not the verify card',
+      (tester) async {
+    await _pump(
+      tester,
+      FakeAuthRepository(
+        initialUser: const AppUser(uid: 'g', email: '', isAnonymous: true),
+      ),
+    );
+
+    expect(find.text('You’re a guest'), findsOneWidget);
+    expect(find.text('Create an account'), findsOneWidget);
+    // No email-verification prompt for a guest (they have no email).
+    expect(find.text('Verify your email'), findsNothing);
+  });
 }

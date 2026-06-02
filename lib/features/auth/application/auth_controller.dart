@@ -29,16 +29,36 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await _auth.registerWithEmail(
-        email: email,
-        password: password,
-        displayName: displayName,
-      );
+      final current = _auth.currentUser;
+      if (current != null && current.isAnonymous) {
+        // Upgrade the guest in place. linkWithCredential keeps the SAME uid,
+        // and all guest data (users/{uid}, workouts, programs, skills) is
+        // uid-keyed, so it carries over automatically — no migration needed.
+        await _auth.linkEmailPassword(
+          email: email,
+          password: password,
+          displayName: displayName,
+        );
+      } else {
+        await _auth.registerWithEmail(
+          email: email,
+          password: password,
+          displayName: displayName,
+        );
+      }
       await _bootstrapProfile();
       // Best-effort: a failed verification email must not fail registration.
       try {
         await _auth.sendEmailVerification();
       } catch (_) {/* user can resend from Profile */}
+    });
+  }
+
+  Future<void> signInAnonymously() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await _auth.signInAnonymously();
+      await _bootstrapProfile();
     });
   }
 

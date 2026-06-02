@@ -4,6 +4,20 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M8 T35 Guest mode (anonymous + upgrade-by-link) [branch feat/calistrack-m8-t35-guest]
+- **Task:** "try without an account" funnel-top (audit major).
+- **Added:** `AuthRepository.signInAnonymously` + `linkEmailPassword`;
+  `AppUser.isAnonymous` from the auth identity; "Try without an account" on
+  login; **register branches** — if the current user is a guest it LINKS the
+  email/password credential in place (same uid → all Firestore data carries over)
+  instead of creating a new account; Profile shows a guest-upgrade card (routes
+  to register) and suppresses the verify-email card for guests; router gate lets
+  a guest reach /register to upgrade.
+- **Tests:** anon sign-in bootstraps; register-while-guest links (same uid, no
+  new account); gate allows guest at /register; Profile guest card vs verify card.
+  99 pass, 81.9%% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 99/99 pass.
+
 ## 2026-06-02 — M8 T34 Branded splash [branch feat/calistrack-m8-t34-splash]
 - **Task:** replace the bare cold-start spinner with a branded splash (audit major).
 - **Added:** `_SplashScreen` (dumbbell logo + "CalisTrack" wordmark + "Master

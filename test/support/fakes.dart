@@ -95,6 +95,34 @@ class FakeAuthRepository implements AuthRepository {
     _set(const AppUser(uid: 'uid_google', email: 'google@example.com'));
   }
 
+  int anonymousCalls = 0;
+  int linkCalls = 0;
+
+  @override
+  Future<void> signInAnonymously() async {
+    anonymousCalls++;
+    if (errorToThrow != null) throw errorToThrow!;
+    _set(const AppUser(uid: 'uid_guest', email: '', isAnonymous: true));
+  }
+
+  @override
+  Future<void> linkEmailPassword({
+    required String email,
+    required String password,
+    String displayName = '',
+  }) async {
+    linkCalls++;
+    if (errorToThrow != null) throw errorToThrow!;
+    // Same uid as the guest — mirrors Firebase linkWithCredential keeping the uid.
+    _set(
+      AppUser(
+        uid: _current?.uid ?? 'uid_guest',
+        email: email,
+        displayName: displayName,
+      ),
+    );
+  }
+
   @override
   Future<void> sendPasswordResetEmail(String email) async {
     resetCalls++;

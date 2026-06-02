@@ -4,6 +4,20 @@ Append-only. Newest at top. One entry per completed task/work session.
 
 ---
 
+## 2026-06-02 — M9 T36 Profile editing [branch feat/calistrack-m9-t36-profile-editing]
+- **Task:** the Profile screen stubbed editing and showed the auth identity's
+  level (always Beginner) rather than the saved profile.
+- **Fixed/added:** Profile now reads the Firestore profile doc
+  (currentUserProfileProvider) for name/level/goals/body-stats (auth identity
+  still used for email/isAnonymous/emailVerified); a details card surfaces
+  goals + height/weight; an Edit action opens `EditProfileScreen`
+  (name/level/goals/height/weight) that merge-persists via
+  `UserRepository.updateDetails` (body stats written even when null so they can
+  be cleared; never touches activeProgramId/onboarding flag).
+- **Tests:** Profile shows the saved level/goals (not the default); edit flow
+  saves (name + level); + existing verify/guest cards still pass. 101 pass, 81.9%% coverage.
+- **Verified locally (Flutter 3.38.9):** format clean · analyze clean · 101/101 pass.
+
 ## 2026-06-02 — M8 T35 Guest mode (anonymous + upgrade-by-link) [branch feat/calistrack-m8-t35-guest]
 - **Task:** "try without an account" funnel-top (audit major).
 - **Added:** `AuthRepository.signInAnonymously` + `linkEmailPassword`;

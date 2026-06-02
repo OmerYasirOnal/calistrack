@@ -159,6 +159,29 @@ class _PreviewUsers implements UserRepository {
       weightKg: weightKg,
     );
   }
+
+  @override
+  Future<void> updateDetails(
+    String uid, {
+    required String displayName,
+    required ExperienceLevel level,
+    required List<String> goals,
+    double? heightCm,
+    double? weightKg,
+  }) async {
+    final base = _store[uid] ?? _demoUser;
+    _store[uid] = AppUser(
+      uid: base.uid,
+      email: base.email,
+      displayName: displayName,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      level: level,
+      goals: goals,
+      activeProgramId: base.activeProgramId,
+      onboardingCompletedAt: base.onboardingCompletedAt,
+    );
+  }
 }
 
 // Some skill progress so the Skills tab shows partial completion.

@@ -32,6 +32,18 @@ abstract interface class UserRepository {
     double? heightCm,
     double? weightKg,
   });
+
+  /// Saves the user-editable profile details (name/level/goals/body stats) in a
+  /// targeted merge. Body stats are written even when null so they can be
+  /// cleared. Never touches `activeProgramId` / `onboardingCompletedAt`.
+  Future<void> updateDetails(
+    String uid, {
+    required String displayName,
+    required ExperienceLevel level,
+    required List<String> goals,
+    double? heightCm,
+    double? weightKg,
+  });
 }
 
 class FirestoreUserRepository implements UserRepository {
@@ -89,6 +101,27 @@ class FirestoreUserRepository implements UserRepository {
           if (goals != null) 'goals': goals,
           if (heightCm != null) 'heightCm': heightCm,
           if (weightKg != null) 'weightKg': weightKg,
+        },
+        SetOptions(merge: true),
+      );
+
+  @override
+  Future<void> updateDetails(
+    String uid, {
+    required String displayName,
+    required ExperienceLevel level,
+    required List<String> goals,
+    double? heightCm,
+    double? weightKg,
+  }) =>
+      _doc(uid).set(
+        {
+          'displayName': displayName,
+          'level': level.name,
+          'goals': goals,
+          // Written even when null so the user can clear a body stat.
+          'heightCm': heightCm,
+          'weightKg': weightKg,
         },
         SetOptions(merge: true),
       );

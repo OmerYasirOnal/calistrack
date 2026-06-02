@@ -1,0 +1,116 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../data/ad_config.dart';
+import 'ad_service.dart';
+
+/// Used on `dart:io` targets. Ads only actually run on Android/iOS; on the test
+/// VM / desktop [isSupported] is false so every method is a graceful no-op (no
+/// plugin calls), which is why widget tests need no override.
+AdService createAdService(Ref ref) => MobileAdService(ref);
+
+class MobileAdService implements AdService {
+  MobileAdService(this._ref);
+
+  final Ref _ref;
+  int _finishedSessions = 0;
+
+  @override
+  bool get isSupported => Platform.isAndroid || Platform.isIOS;
+
+  @override
+  Future<void> initialize() async {
+    if (!isSupported) return;
+    await MobileAds.instance.initialize();
+    // TODO(owner): before release, request iOS App Tracking Transparency
+    // (NSUserTrackingUsageDescription is already in Info.plist) and show a
+    // GDPR/UMP consent form via the user_messaging_platform plugin.
+  }
+
+  @override
+  Widget banner() =>
+      isSupported ? const _BannerAdView() : const SizedBox.shrink();
+
+  @override
+  Future<void> maybeShowInterstitial() async {
+    if (!isSupported) return;
+    _finishedSessions++;
+    final cfg = await _ref.read(adConfigProvider.future);
+    final due = shouldShowInterstitial(
+      _finishedSessions,
+      cfg.interstitialEverySessions,
+    );
+    if (!due) return;
+    await InterstitialAd.load(
+      adUnitId: cfg.interstitialUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) => ad.dispose(),
+            onAdFailedToShowFullScreenContent: (ad, _) => ad.dispose(),
+          );
+          ad.show();
+        },
+        onAdFailedToLoad: (_) {},
+      ),
+    );
+  }
+}
+
+/// Loads a single adaptive banner and renders it once ready (empty until then).
+class _BannerAdView extends ConsumerStatefulWidget {
+  const _BannerAdView();
+
+  @override
+  ConsumerState<_BannerAdView> createState() => _BannerAdViewState();
+}
+
+class _BannerAdViewState extends ConsumerState<_BannerAdView> {
+  BannerAd? _ad;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final cfg = await ref.read(adConfigProvider.future);
+    if (!mounted) return;
+    final ad = BannerAd(
+      adUnitId: cfg.bannerUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          if (mounted) setState(() => _loaded = true);
+        },
+        onAdFailedToLoad: (ad, _) => ad.dispose(),
+      ),
+    );
+    _ad = ad;
+    await ad.load();
+  }
+
+  @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ad = _ad;
+    if (!_loaded || ad == null) return const SizedBox.shrink();
+    return SizedBox(
+      width: ad.size.width.toDouble(),
+      height: ad.size.height.toDouble(),
+      child: AdWidget(ad: ad),
+    );
+  }
+}

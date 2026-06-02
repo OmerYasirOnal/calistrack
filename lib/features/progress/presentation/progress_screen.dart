@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/exercise.dart';
+import '../../ads/application/ad_service.dart';
 import '../../exercises/data/exercise_repository.dart';
 import '../data/progress_repository.dart';
 
@@ -85,6 +86,9 @@ class _ProgressBodyState extends ConsumerState<_ProgressBody> {
                   onSelect: (id) => setState(() => _selectedId = id),
                 ),
         ),
+        const SizedBox(height: Spacing.lg),
+        // Banner ad (a no-op SizedBox on web/desktop/tests; mobile-only).
+        Center(child: ref.watch(adServiceProvider).banner()),
       ],
     );
   }

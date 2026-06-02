@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'features/ads/application/ad_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -29,5 +30,18 @@ Future<void> main() async {
     debugPrintStack(stackTrace: st);
   }
 
-  runApp(const ProviderScope(child: CalisTrackApp()));
+  final container = ProviderContainer();
+  // Best-effort ads init: a no-op on web/desktop/tests, mobile-only otherwise.
+  try {
+    await container.read(adServiceProvider).initialize();
+  } catch (e) {
+    debugPrint('Ads init skipped/failed: $e');
+  }
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const CalisTrackApp(),
+    ),
+  );
 }

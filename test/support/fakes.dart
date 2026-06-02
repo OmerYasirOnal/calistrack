@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:calistrack/features/auth/data/auth_repository.dart';
+import 'package:calistrack/features/notifications/application/notification_service.dart';
 import 'package:calistrack/features/profile/data/user_repository.dart';
 import 'package:calistrack/features/programs/data/user_program_repository.dart';
 import 'package:calistrack/features/skills/data/skill_repository.dart';
@@ -170,6 +171,17 @@ class FakeUserRepository implements UserRepository {
 
   void _emit(String uid) => _controllerFor(uid).add(store[uid]);
 
+  /// Applies a targeted merge to the stored profile and emits it — the in-memory
+  /// analogue of a Firestore `set(.., merge: true)`. Overrides are layered on top
+  /// of the existing doc's JSON, so unwritten fields are preserved and an
+  /// explicit `null` override clears its field (which `copyWith` can't express).
+  void _merge(String uid, Map<String, dynamic> overrides) {
+    final base =
+        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
+    store[uid] = AppUser.fromJson({...base.toJson(), ...overrides});
+    _emit(uid);
+  }
+
   void dispose() {
     for (final c in _controllers.values) {
       c.close();
@@ -202,22 +214,7 @@ class FakeUserRepository implements UserRepository {
   @override
   Future<void> setActiveProgram(String uid, String? programId) async {
     setActiveCalls++;
-    final base =
-        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
-    // Constructed explicitly (not copyWith) so a null programId truly *clears*
-    // the active program — mirroring the Firestore merge write.
-    store[uid] = AppUser(
-      uid: base.uid,
-      email: base.email,
-      displayName: base.displayName,
-      heightCm: base.heightCm,
-      weightKg: base.weightKg,
-      level: base.level,
-      goals: base.goals,
-      activeProgramId: programId,
-      onboardingCompletedAt: base.onboardingCompletedAt,
-    );
-    _emit(uid);
+    _merge(uid, {'activeProgramId': programId});
   }
 
   @override
@@ -254,23 +251,54 @@ class FakeUserRepository implements UserRepository {
     double? weightKg,
   }) async {
     updateDetailsCalls++;
-    final base =
-        store[uid] ?? AppUser(uid: uid, email: 'test_$uid@example.com');
-    // Reconstructed (not copyWith) so null height/weight truly clears.
-    store[uid] = AppUser(
-      uid: base.uid,
-      email: base.email,
-      displayName: displayName,
-      heightCm: heightCm,
-      weightKg: weightKg,
-      level: level,
-      goals: goals,
-      activeProgramId: base.activeProgramId,
-      onboardingCompletedAt: base.onboardingCompletedAt,
-      emailVerified: base.emailVerified,
-      isAnonymous: base.isAnonymous,
-    );
-    _emit(uid);
+    // Body stats are written even when null so they clear, matching the real
+    // targeted merge; the merge helper preserves everything else.
+    _merge(uid, {
+      'displayName': displayName,
+      'level': level.name,
+      'goals': goals,
+      'heightCm': heightCm,
+      'weightKg': weightKg,
+    });
+  }
+
+  int setReminderCalls = 0;
+
+  @override
+  Future<void> setReminder(
+    String uid, {
+    required bool enabled,
+    int? minutes,
+  }) async {
+    setReminderCalls++;
+    _merge(uid, {'reminderEnabled': enabled, 'reminderMinutes': minutes});
+  }
+}
+
+/// Recording [NotificationService] for tests. Captures every `applyReminder`
+/// call and reports a configurable scheduling result (so the denied-permission
+/// path can be exercised).
+class FakeNotificationService implements NotificationService {
+  FakeNotificationService({this.supported = true, this.scheduleResult = true});
+
+  /// What [applyReminder] returns when enabling — `false` simulates a denied OS
+  /// permission.
+  bool scheduleResult;
+  final bool supported;
+  final List<({bool enabled, int? minutes})> applied = [];
+  int initializeCalls = 0;
+
+  @override
+  bool get isSupported => supported;
+
+  @override
+  Future<void> initialize() async => initializeCalls++;
+
+  @override
+  Future<bool> applyReminder({required bool enabled, int? minutes}) async {
+    applied.add((enabled: enabled, minutes: minutes));
+    // Turning off always "succeeds"; only enabling can be denied.
+    return !enabled || scheduleResult;
   }
 }
 

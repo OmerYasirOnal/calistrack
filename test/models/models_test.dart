@@ -192,5 +192,20 @@ void main() {
       final decoded = AppUser.fromJson(json);
       expect(decoded.onboardingCompletedAt, DateTime.utc(2026, 6, 2, 10, 30));
     });
+
+    test('reminder fields default off, round-trip, and copyWith updates them',
+        () {
+      const fresh = AppUser(uid: 'u1', email: 'a@b.com');
+      expect(fresh.reminderEnabled, false);
+      expect(fresh.reminderMinutes, isNull);
+      // Off by default but always serialized; minutes omitted when unset.
+      expect(fresh.toJson()['reminderEnabled'], false);
+      expect(fresh.toJson().containsKey('reminderMinutes'), false);
+
+      final set = fresh.copyWith(reminderEnabled: true, reminderMinutes: 450);
+      final decoded = AppUser.fromJson(set.toJson());
+      expect(decoded.reminderEnabled, true);
+      expect(decoded.reminderMinutes, 450);
+    });
   });
 }

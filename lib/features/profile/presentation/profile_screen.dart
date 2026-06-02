@@ -7,7 +7,9 @@ import '../../../core/theme/app_theme.dart';
 import '../../../models/app_user.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/data/auth_repository.dart';
+import '../../notifications/application/notification_service.dart';
 import '../application/profile_providers.dart';
+import '../data/user_repository.dart';
 import 'edit_profile_screen.dart';
 
 /// Profile & settings — identity, the saved details (level/goals/body stats),
@@ -96,6 +98,8 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: Spacing.md),
                 const _VerifyEmailCard(),
               ],
+              const SizedBox(height: Spacing.md),
+              _ReminderCard(profile: p),
               const SizedBox(height: Spacing.lg),
               OutlinedButton.icon(
                 onPressed: signingOut
@@ -157,6 +161,115 @@ class _DetailsCard extends StatelessWidget {
 
   static String _fmt(double v) =>
       v == v.roundToDouble() ? v.toInt().toString() : v.toString();
+}
+
+/// Opt-in daily workout reminder: a switch + a time row, both driven by the
+/// persisted profile (the source of truth). Toggling/changing the time persists
+/// the preference and (re)schedules the device notification — a no-op on
+/// web/test, real on mobile.
+class _ReminderCard extends ConsumerStatefulWidget {
+  const _ReminderCard({required this.profile});
+
+  final AppUser profile;
+
+  @override
+  ConsumerState<_ReminderCard> createState() => _ReminderCardState();
+}
+
+class _ReminderCardState extends ConsumerState<_ReminderCard> {
+  bool _busy = false;
+
+  Future<void> _persist({required bool enabled, required int? minutes}) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final uid = widget.profile.uid;
+    final users = ref.read(userRepositoryProvider);
+    setState(() => _busy = true);
+    try {
+      // Persist the intent first (the profile doc is the source of truth that
+      // renders the switch), then schedule on the device.
+      await users.setReminder(uid, enabled: enabled, minutes: minutes);
+      var scheduled = true;
+      try {
+        scheduled = await ref
+            .read(notificationServiceProvider)
+            .applyReminder(enabled: enabled, minutes: minutes);
+      } catch (_) {
+        // A thrown failure while enabling counts as "not scheduled".
+        scheduled = !enabled;
+      }
+      if (enabled && !scheduled) {
+        // The OS notification permission was denied — roll the toggle back so it
+        // doesn't lie (showing "on" while nothing fires) and explain why.
+        await users.setReminder(uid, enabled: false, minutes: minutes);
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Enable notifications in Settings to get reminders.',
+              ),
+            ),
+          );
+      }
+    } catch (_) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Could not update the reminder.')),
+        );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _toggle(bool on) => _persist(
+        enabled: on,
+        // Keep the chosen time across off/on; default it on first enable.
+        minutes: widget.profile.reminderMinutes ?? defaultReminderMinutes,
+      );
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: reminderTimeOfDay(
+        widget.profile.reminderMinutes ?? defaultReminderMinutes,
+      ),
+    );
+    if (picked == null) return;
+    await _persist(enabled: true, minutes: picked.hour * 60 + picked.minute);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = widget.profile.reminderEnabled;
+    final minutes = widget.profile.reminderMinutes ?? defaultReminderMinutes;
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications_active_outlined),
+            title: const Text('Daily reminder'),
+            subtitle: const Text('A nudge to keep your streak going'),
+            value: enabled,
+            onChanged: _busy ? null : _toggle,
+          ),
+          if (enabled)
+            ListTile(
+              contentPadding: const EdgeInsets.only(
+                left: 72,
+                right: Spacing.md,
+              ),
+              title: const Text('Reminder time'),
+              trailing: Text(
+                reminderTimeOfDay(minutes).format(context),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              onTap: _busy ? null : _pickTime,
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Shown on Profile for a guest (anonymous) session — invites creating a real

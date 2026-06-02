@@ -30,6 +30,8 @@ class AppUser {
     this.onboardingCompletedAt,
     this.emailVerified = true,
     this.isAnonymous = false,
+    this.reminderEnabled = false,
+    this.reminderMinutes,
   });
 
   final String uid;
@@ -51,6 +53,11 @@ class AppUser {
   /// ([mapFirebaseUser]); drives the Profile "create an account" upgrade prompt.
   final bool isAnonymous;
 
+  /// Whether the daily workout reminder is on, and the time of day to fire it
+  /// as minutes since midnight (0–1439, null when unset). Device-scheduled.
+  final bool reminderEnabled;
+  final int? reminderMinutes;
+
   /// When the one-time first-run onboarding was finished. Null means the user
   /// has not completed onboarding yet — this is what the router's `/onboarding`
   /// gate keys off. Persisted as an ISO-8601 string, matching the date
@@ -71,6 +78,8 @@ class AppUser {
         activeProgramId: json['activeProgramId'] as String?,
         onboardingCompletedAt:
             DateTime.tryParse(json['onboardingCompletedAt'] as String? ?? ''),
+        reminderEnabled: json['reminderEnabled'] as bool? ?? false,
+        reminderMinutes: (json['reminderMinutes'] as num?)?.toInt(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -84,6 +93,8 @@ class AppUser {
         if (activeProgramId != null) 'activeProgramId': activeProgramId,
         if (onboardingCompletedAt != null)
           'onboardingCompletedAt': onboardingCompletedAt!.toIso8601String(),
+        'reminderEnabled': reminderEnabled,
+        if (reminderMinutes != null) 'reminderMinutes': reminderMinutes,
       };
 
   AppUser copyWith({
@@ -96,6 +107,8 @@ class AppUser {
     DateTime? onboardingCompletedAt,
     bool? emailVerified,
     bool? isAnonymous,
+    bool? reminderEnabled,
+    int? reminderMinutes,
   }) =>
       AppUser(
         uid: uid,
@@ -110,5 +123,7 @@ class AppUser {
             onboardingCompletedAt ?? this.onboardingCompletedAt,
         emailVerified: emailVerified ?? this.emailVerified,
         isAnonymous: isAnonymous ?? this.isAnonymous,
+        reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+        reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       );
 }

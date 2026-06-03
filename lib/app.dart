@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/l10n/app_strings.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/data/auth_repository.dart';
+
+/// Localization wiring shared by both MaterialApp variants — our hand-rolled
+/// [AppStrings] plus the Flutter global delegates so Material/Cupertino widgets
+/// (date/time pickers, etc.) speak Turkish too.
+const _localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  AppStrings.delegate,
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+];
 
 /// Root application widget. Dark-first Material 3.
 ///
@@ -24,6 +36,8 @@ class CalisTrackApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
         themeMode: ThemeMode.dark,
+        localizationsDelegates: _localizationsDelegates,
+        supportedLocales: AppStrings.supportedLocales,
         home: const _SplashScreen(),
       );
     }
@@ -34,6 +48,8 @@ class CalisTrackApp extends ConsumerWidget {
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
+      localizationsDelegates: _localizationsDelegates,
+      supportedLocales: AppStrings.supportedLocales,
       routerConfig: ref.watch(goRouterProvider),
     );
   }
@@ -63,7 +79,7 @@ class _SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Master bodyweight strength',
+              AppStrings.of(context).appTagline,
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: 32),

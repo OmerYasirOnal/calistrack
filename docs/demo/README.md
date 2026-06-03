@@ -17,3 +17,16 @@ browser** — pure Dart, no native deps, $0, offline. Seeded history is 12·11·
 
 The **CalisTrack Pro** card (Go Pro → paywall). AI generation is Pro-gated; ads
 are gated on `!isPro`. Real store billing is the owner step (RevenueCat).
+
+## Pro gating — skill-trees
+![Skills — Pro locks](live-skills-pro-locks.png)
+
+Foundational trees (Handstand, Pistol Squat) are free with progress bars; the
+elite trees (Muscle-up, Front Lever, Planche) carry a **🔒 PRO** lock and route
+to the paywall.
+
+## Pro gating — advanced analytics
+![Progress — analytics locked](live-progress-analytics-locked.png)
+
+Free users get the per-exercise chart; the **Advanced analytics** card (30-day
+volume, frequency, top movement) is a locked Pro CTA.

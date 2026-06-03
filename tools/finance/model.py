@@ -42,13 +42,17 @@ APPLE_YEARLY = 99.0           # months 1 and 13
 # id: (installs/mo month1, monthly install growth, free->paid conv, annual mix,
 #      monthly-sub churn, free-user monthly churn, activation, ad ARPDAU,
 #      active days/mo for a free user)
+# Ad assumptions are deliberately conservative (brief §2: a TR/EU-weighted
+# habit-tracking utility realizes ARPDAU at/below the LOW end, and ads must NOT
+# carry the model) and free-user churn is realistic (free users leave fast), so
+# subscriptions dominate the mix — matching the strategy.
 SCENARIOS = {
     "LOW":  dict(inst0=300,  g=0.00, conv=0.010, amix=0.50, mchurn=0.18,
-                 uchurn=0.22, act=0.55, arpdau=0.01, days=6,  color="#d1495b"),
+                 uchurn=0.35, act=0.55, arpdau=0.01, days=4, color="#d1495b"),
     "BASE": dict(inst0=1200, g=0.05, conv=0.020, amix=0.60, mchurn=0.12,
-                 uchurn=0.18, act=0.60, arpdau=0.03, days=8,  color="#2a9d8f"),
+                 uchurn=0.28, act=0.60, arpdau=0.02, days=5, color="#2a9d8f"),
     "HIGH": dict(inst0=4000, g=0.08, conv=0.035, amix=0.67, mchurn=0.08,
-                 uchurn=0.14, act=0.65, arpdau=0.10, days=10, color="#1d3557"),
+                 uchurn=0.20, act=0.65, arpdau=0.05, days=7, color="#1d3557"),
 }
 
 

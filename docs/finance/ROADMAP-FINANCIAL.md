@@ -35,12 +35,13 @@ gantt
 
 | Scenario | Installs/mo (start→grow) | Conv. | Net rev @ M18 | 18-mo cumulative | Payers by M12 |
 |---|---|---|---|---|---|
-| **LOW** | 300, flat | 1.0% | **~$150/mo** | **~$2.1k** | ~36 |
-| **BASE** | 1,200, +5%/mo | 2.0% | **~$3.6k/mo** | **~$37.7k** | ~382 |
-| **HIGH** | 4,000, +8%/mo | 3.5% | **~$63.8k/mo** | **~$561k** | ~2,657 |
+| **LOW** | 300, flat | 1.0% | **~$120/mo** | **~$1.7k** | ~36 |
+| **BASE** | 1,200, +5%/mo | 2.0% | **~$2.4k/mo** | **~$24.7k** | ~382 |
+| **HIGH** | 4,000, +8%/mo | 3.5% | **~$30.3k/mo** | **~$269k** | ~2,657 |
 
-Net of the 15% store commission; ads are net to the publisher (ARPDAU). Cumulative
-cash also subtracts the $25 Google Play and $99/yr Apple fees.
+Net of the 15% store commission; ads are net to the publisher (ARPDAU), modelled
+conservatively (brief §2 — ads must not carry the model). Cumulative cash also
+subtracts the $25 Google Play and $99/yr Apple fees.
 
 ### Monthly net revenue
 ![Monthly net revenue](01_monthly_revenue.png)

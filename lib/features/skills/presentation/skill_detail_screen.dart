@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../models/skill_progress.dart';
+import '../../billing/application/entitlement.dart';
+import '../../billing/presentation/paywall_screen.dart';
 import '../application/skill_providers.dart';
 import '../data/skill_repository.dart';
 
@@ -65,6 +67,8 @@ class _SkillDetail extends ConsumerWidget {
     final text = Theme.of(context).textTheme;
     final current = skill.currentStep;
     final controller = ref.read(skillControllerProvider.notifier);
+    // Defence-in-depth: an advanced tree is Pro even if reached via a deep link.
+    final locked = !skill.free && !ref.watch(entitlementProvider).isPro;
 
     return Scaffold(
       appBar: AppBar(title: Text(skill.name)),
@@ -88,7 +92,42 @@ class _SkillDetail extends ConsumerWidget {
                       : _StepState.locked,
             ),
           const SizedBox(height: Spacing.lg),
-          if (current != null) ...[
+          if (locked)
+            Card(
+              color: scheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(Spacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.lock_outline, color: scheme.primary),
+                        const SizedBox(width: Spacing.sm),
+                        Expanded(
+                          child: Text(
+                            'This skill-tree is a Pro feature',
+                            style: text.titleSmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: Spacing.sm),
+                    FilledButton(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const PaywallScreen(
+                            reason: 'Full skill-trees are a Pro feature.',
+                          ),
+                        ),
+                      ),
+                      child: const Text('Unlock with Pro'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else if (current != null) ...[
             _StepLogger(
               key: ValueKey(current.id),
               step: current,
@@ -121,7 +160,7 @@ class _SkillDetail extends ConsumerWidget {
                 ),
               ),
             ),
-          if (skill.currentStepIndex > 0) ...[
+          if (!locked && skill.currentStepIndex > 0) ...[
             const SizedBox(height: Spacing.sm),
             TextButton(
               onPressed: () => controller.setStep(

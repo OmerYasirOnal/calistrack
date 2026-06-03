@@ -1,0 +1,42 @@
+{
+  "_comment": "CalisTrack Pro pricing + benefits. priceUsd is the anchor/high-geo price; priceTry is a store-native LOCAL tier for Turkey (NOT an FX conversion). Research-backed (docs/strategy/2026-06-03-monetization-strategy-brief.md). TODO(owner): map each plan id to a real RevenueCat/store product before charging.",
+  "_benefitsNote": "Every benefit here is actually gated in-app: AI generation (programs_screen), full skill-trees (skills_screen), advanced analytics (progress_screen), and ad removal (entitlement).",
+  "proBenefits": [
+    "AI-generated programs tailored to your level & goals",
+    "Full skill-trees: muscle-up, front lever & planche",
+    "Advanced analytics: 30-day volume, frequency & top movement",
+    "No ads — train uninterrupted"
+  ],
+  "plans": [
+    {
+      "id": "annual",
+      "title": "Annual",
+      "priceUsd": "$29.99",
+      "priceTry": "₺299",
+      "period": "per year",
+      "subtitle": "≈ $2.50 / month — best value",
+      "highlighted": true,
+      "badge": "Save 58%"
+    },
+    {
+      "id": "monthly",
+      "title": "Monthly",
+      "priceUsd": "$5.99",
+      "priceTry": "₺59",
+      "period": "per month",
+      "subtitle": "Cancel anytime",
+      "highlighted": false,
+      "badge": null
+    },
+    {
+      "id": "lifetime",
+      "title": "Lifetime",
+      "priceUsd": "$79",
+      "priceTry": "₺799",
+      "period": "one-time",
+      "subtitle": "Pay once, keep forever",
+      "highlighted": false,
+      "badge": null
+    }
+  ]
+}

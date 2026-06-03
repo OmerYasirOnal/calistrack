@@ -1,0 +1,64 @@
+name: deploy-web
+
+# Builds the Flutter web demo (the Firebase-free in-memory preview target) and
+# publishes it to GitHub Pages — a $0, live, installable PWA showcase of the app
+# (incl. the on-device Smart-target model and the Pro paywall, in demo mode).
+#
+# One owner step: repo Settings → Pages → Build and deployment → Source =
+# "GitHub Actions". Then push to main or run this workflow manually.
+# For a commercial launch, swap the publish step for Cloudflare Pages (see
+# docs/DEPLOY-WEB.md) — the build command is identical.
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One concurrent deploy; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Pinned for a reproducible public build; bump deliberately.
+          flutter-version: 3.38.9
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web (preview demo target)
+        # base-href matches the project Pages path: /<repo>/.
+        # CALISTRACK_DEMO enables the in-app Pro demo unlock for this showcase
+        # build only (release app builds omit it, so billing can't be bypassed).
+        run: flutter build web --release -t lib/preview.dart --base-href /calistrack/ --dart-define=CALISTRACK_DEMO=true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

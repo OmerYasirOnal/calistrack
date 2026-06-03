@@ -69,6 +69,7 @@ class SkillProgress {
     this.description = '',
     this.currentStepIndex = 0,
     this.logs = const [],
+    this.free = false,
   });
 
   final String id;
@@ -77,6 +78,10 @@ class SkillProgress {
   final List<SkillStep> steps;
   final int currentStepIndex;
   final List<SkillLog> logs;
+
+  /// Whether this skill tree is available on the free tier. Advanced/"elite"
+  /// trees are Pro; a couple of foundational ones are free (set in skills.json).
+  final bool free;
 
   SkillStep? get currentStep =>
       (currentStepIndex >= 0 && currentStepIndex < steps.length)
@@ -97,6 +102,7 @@ class SkillProgress {
         logs: (json['logs'] as List<dynamic>? ?? [])
             .map((e) => SkillLog.fromJson(e as Map<String, dynamic>))
             .toList(),
+        free: json['free'] as bool? ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -106,6 +112,7 @@ class SkillProgress {
         'steps': steps.map((e) => e.toJson()).toList(),
         'currentStepIndex': currentStepIndex,
         'logs': logs.map((e) => e.toJson()).toList(),
+        'free': free,
       };
 
   SkillProgress copyWith({
@@ -119,5 +126,6 @@ class SkillProgress {
         steps: steps,
         currentStepIndex: currentStepIndex ?? this.currentStepIndex,
         logs: logs ?? this.logs,
+        free: free,
       );
 }

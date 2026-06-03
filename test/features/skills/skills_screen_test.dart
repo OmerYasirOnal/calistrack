@@ -17,6 +17,7 @@ const _presets = [
     id: 'front_lever',
     name: 'Front Lever',
     description: 'A horizontal hold.',
+    free: true, // free here so these mechanics tests aren't paywalled
     steps: [
       SkillStep(id: 'tuck', name: 'Tuck', targetHoldSeconds: 15),
       SkillStep(id: 'adv', name: 'Advanced tuck', targetHoldSeconds: 15),
@@ -25,6 +26,7 @@ const _presets = [
   SkillProgress(
     id: 'pistol',
     name: 'Pistol Squat',
+    free: true,
     steps: [SkillStep(id: 'assisted', name: 'Assisted', targetReps: 8)],
   ),
 ];
@@ -130,6 +132,55 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Skill not found.'), findsOneWidget);
+  });
+
+  testWidgets('free user: advanced (non-free) skill is locked → paywall',
+      (tester) async {
+    const mixed = [
+      SkillProgress(
+        id: 'muscle_up',
+        name: 'Muscle-up',
+        steps: [SkillStep(id: 'mu', name: 'Muscle-up', targetReps: 1)],
+      ), // free defaults to false → Pro-gated
+      SkillProgress(
+        id: 'handstand',
+        name: 'Handstand',
+        free: true,
+        steps: [
+          SkillStep(id: 'wall', name: 'Wall plank', targetHoldSeconds: 40),
+        ],
+      ),
+    ];
+    final auth = FakeAuthRepository(
+      initialUser: const AppUser(uid: 'u1', email: 'a@b.com'),
+    );
+    final skills = FakeSkillRepository(mixed);
+    addTearDown(() {
+      auth.dispose();
+      skills.dispose();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          skillRepositoryProvider.overrideWithValue(skills),
+        ],
+        child: const MaterialApp(home: SkillsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Muscle-up'), findsOneWidget);
+    expect(find.text('Handstand'), findsOneWidget);
+    // Only the gated tree carries the PRO lock.
+    expect(find.text('PRO'), findsOneWidget);
+
+    // Tapping the locked tree opens the paywall (not the detail).
+    await tester.tap(find.text('Muscle-up'));
+    await tester.pumpAndSettle();
+    expect(find.text('CalisTrack Pro'), findsOneWidget);
+    expect(find.text('Wall plank'), findsNothing); // didn't open a detail
   });
 
   testWidgets('the intro is hidden once a skill has progress', (tester) async {

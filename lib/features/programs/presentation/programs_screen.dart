@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/program.dart';
+import '../../billing/application/entitlement.dart';
+import '../../billing/presentation/paywall_screen.dart';
 import '../../profile/application/profile_providers.dart';
 import '../data/program_repository.dart';
 import '../data/user_program_repository.dart';
@@ -33,11 +35,25 @@ class ProgramsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Programs')),
       floatingActionButton: FloatingActionButton.extended(
-        // root navigator → the form is a full-screen modal over the tab bar.
-        onPressed: () => Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute<void>(builder: (_) => const AiGenerationScreen()),
+        // AI generation is a Pro feature — free users hit the paywall. Both open
+        // on the root navigator → a full-screen modal over the tab bar.
+        onPressed: () {
+          final isPro = ref.read(entitlementProvider).isPro;
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute<void>(
+              builder: (_) => isPro
+                  ? const AiGenerationScreen()
+                  : const PaywallScreen(
+                      reason: 'AI program generation is a Pro feature.',
+                    ),
+            ),
+          );
+        },
+        icon: Icon(
+          ref.watch(entitlementProvider).isPro
+              ? Icons.auto_awesome
+              : Icons.lock_outline,
         ),
-        icon: const Icon(Icons.auto_awesome),
         label: const Text('Generate'),
       ),
       body: presets.when(

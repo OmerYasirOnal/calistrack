@@ -8,6 +8,8 @@ import '../../../../models/program.dart';
 import '../../../../models/workout.dart';
 import '../../../exercises/data/exercise_repository.dart';
 import '../../../programs/presentation/program_format.dart';
+import '../../../progress/application/progression_model.dart';
+import '../../../progress/application/smart_target.dart';
 import '../../../workout/application/workout_session.dart';
 
 /// How a movement is logged, derived from which target field the preset sets.
@@ -40,6 +42,10 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
   late final LogMode _mode = logModeFor(widget.exercise);
   late int _reps = widget.exercise.targetReps ?? 10;
   double _weight = 0;
+
+  /// Reps-in-reserve for the next logged set (optional effort signal the
+  /// on-device model reads). Defaults to a moderate 2; seeded from last time.
+  int _rir = 2;
   late int _seconds = widget.exercise.targetHoldSeconds ??
       widget.exercise.targetDurationSeconds ??
       30;
@@ -55,6 +61,7 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
       case LogMode.reps:
         _reps = last.reps;
         _weight = last.addedWeightKg;
+        if (last.rir != null) _rir = last.rir!;
       case LogMode.hold:
         if (last.holdSeconds != null) _seconds = last.holdSeconds!;
       case LogMode.time:
@@ -66,7 +73,7 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
 
   void _log() {
     final set = switch (_mode) {
-      LogMode.reps => LoggedSet(reps: _reps, addedWeightKg: _weight),
+      LogMode.reps => LoggedSet(reps: _reps, addedWeightKg: _weight, rir: _rir),
       LogMode.hold => LoggedSet(reps: 1, holdSeconds: _seconds),
       LogMode.distance => LoggedSet(reps: 1, distanceMeters: _meters),
       LogMode.time => LoggedSet(reps: 1, durationSeconds: _seconds),
@@ -155,6 +162,8 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
                   ),
                 ),
               ),
+            if (_mode == LogMode.reps && widget.exercise.targetReps != null)
+              _smartTargetLine(scheme, text),
             if (logged.isNotEmpty) ...[
               const SizedBox(height: Spacing.sm),
               Wrap(
@@ -201,23 +210,36 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
 
   Widget _primaryInput() {
     return switch (_mode) {
-      LogMode.reps => Row(
-          children: [
-            _Stepper(
-              label: 'reps',
-              value: '$_reps',
-              onMinus: () => setState(() => _reps = (_reps - 1).clamp(0, 999)),
-              onPlus: () => setState(() => _reps = _reps + 1),
-            ),
-            const SizedBox(width: Spacing.md),
-            _Stepper(
-              label: 'kg',
-              value: _weight.toStringAsFixed(_weight % 1 == 0 ? 0 : 1),
-              onMinus: () =>
-                  setState(() => _weight = (_weight - 2.5).clamp(0, 999)),
-              onPlus: () => setState(() => _weight = _weight + 2.5),
-            ),
-          ],
+      // Horizontally scrollable so reps + kg + RIR never overflow on narrow
+      // phones.
+      LogMode.reps => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _Stepper(
+                label: 'reps',
+                value: '$_reps',
+                onMinus: () =>
+                    setState(() => _reps = (_reps - 1).clamp(0, 999)),
+                onPlus: () => setState(() => _reps = _reps + 1),
+              ),
+              const SizedBox(width: Spacing.md),
+              _Stepper(
+                label: 'kg',
+                value: _weight.toStringAsFixed(_weight % 1 == 0 ? 0 : 1),
+                onMinus: () =>
+                    setState(() => _weight = (_weight - 2.5).clamp(0, 999)),
+                onPlus: () => setState(() => _weight = _weight + 2.5),
+              ),
+              const SizedBox(width: Spacing.md),
+              _Stepper(
+                label: 'RIR',
+                value: '$_rir',
+                onMinus: () => setState(() => _rir = (_rir - 1).clamp(0, 10)),
+                onPlus: () => setState(() => _rir = (_rir + 1).clamp(0, 10)),
+              ),
+            ],
+          ),
         ),
       LogMode.hold || LogMode.time => _Stepper(
           label: 'sec',
@@ -250,6 +272,91 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
   }
 
   String _lastSummary(List<LoggedSet> sets) => sets.map(_setLabel).join(' · ');
+
+  /// The free, on-device "Smart target" suggestion for this exercise. Shows the
+  /// model's recommendation (action + rationale + confidence) with an Apply
+  /// button that seeds the inputs. Renders nothing until there's history.
+  Widget _smartTargetLine(ColorScheme scheme, TextTheme text) {
+    final key = (
+      exerciseId: widget.exercise.exerciseId,
+      targetReps: widget.exercise.targetReps ?? 0,
+    );
+    final s = ref.watch(smartTargetProvider(key)).valueOrNull;
+    if (s == null) return const SizedBox.shrink();
+
+    final (color, icon) = switch (s.action) {
+      ProgressionAction.increase => (scheme.primary, Icons.trending_up),
+      ProgressionAction.maintain => (scheme.tertiary, Icons.trending_flat),
+      ProgressionAction.deload => (scheme.error, Icons.trending_down),
+    };
+    final pct = (s.confidence * 100).round();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: Spacing.sm),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.sm,
+          vertical: Spacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: Spacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Smart target: ${_suggestionTarget(s)}  ·  $pct%',
+                    style: text.labelLarge
+                        ?.copyWith(color: color, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    s.rationale,
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            if (s.targetReps != null)
+              TextButton(
+                onPressed: () => _applySuggestion(s),
+                child: const Text('Apply'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _suggestionTarget(ProgressionSuggestion s) {
+    final reps = s.targetReps;
+    final kg = s.targetAddedWeightKg;
+    if (reps != null && kg != null && kg > 0) {
+      return '$reps reps @ ${kg.toStringAsFixed(kg % 1 == 0 ? 0 : 1)} kg';
+    }
+    if (reps != null) return '$reps reps';
+    return switch (s.action) {
+      ProgressionAction.increase => 'progress',
+      ProgressionAction.maintain => 'hold',
+      ProgressionAction.deload => 'back off',
+    };
+  }
+
+  void _applySuggestion(ProgressionSuggestion s) {
+    setState(() {
+      if (s.targetReps != null) _reps = s.targetReps!;
+      if (s.targetAddedWeightKg != null) _weight = s.targetAddedWeightKg!;
+      _seeded =
+          true; // don't let the last-time seed overwrite the applied value
+    });
+  }
 }
 
 class _Stepper extends StatelessWidget {

@@ -160,6 +160,17 @@ void main() {
       expect(decoded.completionRatio, 0.5);
       expect(decoded.logs.single.holdSeconds, 10);
     });
+
+    test('free flag round-trips and defaults to false', () {
+      const free =
+          SkillProgress(id: 'h', name: 'Handstand', steps: [], free: true);
+      expect(SkillProgress.fromJson(free.toJson()).free, isTrue);
+      // Legacy JSON without the field decodes as not-free (Pro-gated).
+      expect(
+        SkillProgress.fromJson(const {'id': 'm', 'name': 'Muscle-up'}).free,
+        isFalse,
+      );
+    });
   });
 
   group('AppUser', () {

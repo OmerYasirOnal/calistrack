@@ -22,15 +22,16 @@ const _defaultRir = 2.0;
 const _repRange = 4;
 
 _SessionStat? _statFor(Workout w, String exerciseId) {
-  final logged = w.exercises.firstWhereOrNull((e) => e.exerciseId == exerciseId);
+  final logged =
+      w.exercises.firstWhereOrNull((e) => e.exerciseId == exerciseId);
   if (logged == null || logged.sets.isEmpty) return null;
-  final topReps = logged.sets.map((s) => s.reps).reduce((a, b) => a > b ? a : b);
+  final topReps =
+      logged.sets.map((s) => s.reps).reduce((a, b) => a > b ? a : b);
   final topWeight = logged.topWeight;
-  final rirs = logged.sets
-      .map((s) => s.rir)
-      .whereType<int>()
-      .toList(growable: false);
-  final avgRir = rirs.isEmpty ? null : rirs.reduce((a, b) => a + b) / rirs.length;
+  final rirs =
+      logged.sets.map((s) => s.rir).whereType<int>().toList(growable: false);
+  final avgRir =
+      rirs.isEmpty ? null : rirs.reduce((a, b) => a + b) / rirs.length;
   return _SessionStat(topReps, topWeight, avgRir);
 }
 

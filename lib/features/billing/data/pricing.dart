@@ -16,7 +16,8 @@ class PricingPlan {
     this.badge,
   });
 
-  final String id; // 'annual' | 'monthly' | 'lifetime' — maps to a store product
+  final String
+      id; // 'annual' | 'monthly' | 'lifetime' — maps to a store product
   final String title;
   final String priceUsd;
   final String priceTry;

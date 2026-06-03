@@ -300,8 +300,8 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
                   ),
                   Text(
                     s.rationale,
-                    style:
-                        text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -335,7 +335,8 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
     setState(() {
       if (s.targetReps != null) _reps = s.targetReps!;
       if (s.targetAddedWeightKg != null) _weight = s.targetAddedWeightKg!;
-      _seeded = true; // don't let the last-time seed overwrite the applied value
+      _seeded =
+          true; // don't let the last-time seed overwrite the applied value
     });
   }
 }

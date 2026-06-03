@@ -36,11 +36,15 @@ Widget _app() => ProviderScope(
     );
 
 void main() {
-  testWidgets('renders benefits, plans, prices, and the reason', (tester) async {
+  testWidgets('renders benefits, plans, prices, and the reason',
+      (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('AI program generation is a Pro feature.'), findsOneWidget);
+    expect(
+      find.text('AI program generation is a Pro feature.'),
+      findsOneWidget,
+    );
     expect(find.text('AI-generated programs'), findsOneWidget);
     expect(find.text('Annual'), findsOneWidget);
     expect(find.text('Monthly'), findsOneWidget);

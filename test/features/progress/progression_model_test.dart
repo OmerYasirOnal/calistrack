@@ -32,8 +32,11 @@ void main() {
             (c['probs'] as List).map((e) => (e as num).toDouble()).toList();
         final got = model.predictProbs(base);
         for (var i = 0; i < 3; i++) {
-          expect(got[i], closeTo(expected[i], 1e-4),
-              reason: 'prob[$i] for base $base');
+          expect(
+            got[i],
+            closeTo(expected[i], 1e-4),
+            reason: 'prob[$i] for base $base',
+          );
         }
         expect(model.predict(base).index, c['predicted']);
       }
@@ -117,7 +120,12 @@ void main() {
 
     test('increase, bodyweight -> aim for +1 rep', () {
       const input = ProgressionInput(
-          topRepsLast: 11, repHigh: 10, sessionsAtTop: 2, trend3: 0.5, avgRir: 2);
+        topRepsLast: 11,
+        repHigh: 10,
+        sessionsAtTop: 2,
+        trend3: 0.5,
+        avgRir: 2,
+      );
       final s = buildSuggestion(m, input, lastTopWeightKg: 0);
       expect(s.action, ProgressionAction.increase);
       expect(s.targetReps, 12);
@@ -126,7 +134,12 @@ void main() {
 
     test('increase, weighted -> +2.5 kg', () {
       const input = ProgressionInput(
-          topRepsLast: 11, repHigh: 10, sessionsAtTop: 2, trend3: 0.5, avgRir: 2);
+        topRepsLast: 11,
+        repHigh: 10,
+        sessionsAtTop: 2,
+        trend3: 0.5,
+        avgRir: 2,
+      );
       final s = buildSuggestion(m, input, lastTopWeightKg: 10);
       expect(s.action, ProgressionAction.increase);
       expect(s.targetAddedWeightKg, 12.5);
@@ -135,7 +148,12 @@ void main() {
 
     test('deload, bodyweight -> ease off two reps', () {
       const input = ProgressionInput(
-          topRepsLast: 8, repHigh: 10, sessionsAtTop: 0, trend3: -2, avgRir: 0);
+        topRepsLast: 8,
+        repHigh: 10,
+        sessionsAtTop: 0,
+        trend3: -2,
+        avgRir: 0,
+      );
       final s = buildSuggestion(m, input, lastTopWeightKg: 0);
       expect(s.action, ProgressionAction.deload);
       expect(s.targetReps, 6);
@@ -143,7 +161,12 @@ void main() {
 
     test('confidence is 1.0 for the heuristic model', () {
       const input = ProgressionInput(
-          topRepsLast: 9, repHigh: 10, sessionsAtTop: 0, trend3: 0, avgRir: 1);
+        topRepsLast: 9,
+        repHigh: 10,
+        sessionsAtTop: 0,
+        trend3: 0,
+        avgRir: 1,
+      );
       final s = buildSuggestion(m, input, lastTopWeightKg: 0);
       expect(s.confidence, 1.0);
       expect(s.action, ProgressionAction.maintain);

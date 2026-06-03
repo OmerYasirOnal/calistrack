@@ -164,7 +164,8 @@ class _PlanCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(Spacing.md),
         decoration: BoxDecoration(
-          color: accent ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+          color:
+              accent ? scheme.primaryContainer : scheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: accent ? scheme.primary : scheme.outlineVariant,

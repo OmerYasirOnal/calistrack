@@ -6,6 +6,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/program.dart';
 import '../../ads/application/ad_service.dart';
+import '../../billing/application/entitlement.dart';
 import '../../programs/application/program_providers.dart';
 import '../../workout/application/workout_session.dart';
 import '../../workout/data/training_defaults.dart';
@@ -92,10 +93,11 @@ class _ActiveDayState extends ConsumerState<_ActiveDay> {
       if (!mounted) return;
       if (workout != null) {
         await showSessionSummary(context, workout);
-        // Count this session and maybe show an interstitial (capped; no-op on
-        // web/desktop/tests). Its own try so an ad failure never masquerades as
-        // a save failure — the session is already persisted by this point.
-        if (mounted) {
+        // Count this session and maybe show an interstitial — free users only
+        // (Pro removes ads), capped, no-op on web/desktop/tests. Its own try so
+        // an ad failure never masquerades as a save failure — the session is
+        // already persisted by this point.
+        if (mounted && ref.read(adsEnabledProvider)) {
           try {
             await ref.read(adServiceProvider).maybeShowInterstitial();
           } catch (e) {

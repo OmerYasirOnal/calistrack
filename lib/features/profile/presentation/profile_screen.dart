@@ -7,6 +7,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../models/app_user.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/data/auth_repository.dart';
+import '../../billing/application/entitlement.dart';
+import '../../billing/presentation/paywall_screen.dart';
 import '../../notifications/application/notification_service.dart';
 import '../application/profile_providers.dart';
 import '../data/user_repository.dart';
@@ -99,6 +101,8 @@ class ProfileScreen extends ConsumerWidget {
                 const _VerifyEmailCard(),
               ],
               const SizedBox(height: Spacing.md),
+              const _ProCard(),
+              const SizedBox(height: Spacing.md),
               _ReminderCard(profile: p),
               const SizedBox(height: Spacing.lg),
               OutlinedButton.icon(
@@ -111,6 +115,63 @@ class ProfileScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// CalisTrack Pro upsell / status. Free users get a "Go Pro" CTA to the
+/// paywall; Pro users see active status. The Pro state is driven by
+/// [entitlementProvider] (the billing seam).
+class _ProCard extends ConsumerWidget {
+  const _ProCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final isPro = ref.watch(entitlementProvider).isPro;
+    return Card(
+      color: isPro ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.workspace_premium, color: scheme.primary),
+                const SizedBox(width: Spacing.sm),
+                Expanded(
+                  child: Text(
+                    isPro ? 'CalisTrack Pro — active' : 'CalisTrack Pro',
+                    style: text.titleSmall,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.xs),
+            Text(
+              isPro
+                  ? 'AI programs, full skill-trees, advanced analytics, and no ads.'
+                  : 'Unlock AI programs, full skill-trees, advanced analytics, '
+                      'and remove ads.',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: Spacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const PaywallScreen(),
+                  ),
+                ),
+                child: Text(isPro ? 'Manage' : 'Go Pro'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

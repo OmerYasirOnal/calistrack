@@ -8,6 +8,8 @@ import '../../../../models/program.dart';
 import '../../../../models/workout.dart';
 import '../../../exercises/data/exercise_repository.dart';
 import '../../../programs/presentation/program_format.dart';
+import '../../../progress/application/progression_model.dart';
+import '../../../progress/application/smart_target.dart';
 import '../../../workout/application/workout_session.dart';
 
 /// How a movement is logged, derived from which target field the preset sets.
@@ -155,6 +157,8 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
                   ),
                 ),
               ),
+            if (_mode == LogMode.reps && widget.exercise.targetReps != null)
+              _smartTargetLine(scheme, text),
             if (logged.isNotEmpty) ...[
               const SizedBox(height: Spacing.sm),
               Wrap(
@@ -250,6 +254,90 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
   }
 
   String _lastSummary(List<LoggedSet> sets) => sets.map(_setLabel).join(' · ');
+
+  /// The free, on-device "Smart target" suggestion for this exercise. Shows the
+  /// model's recommendation (action + rationale + confidence) with an Apply
+  /// button that seeds the inputs. Renders nothing until there's history.
+  Widget _smartTargetLine(ColorScheme scheme, TextTheme text) {
+    final key = (
+      exerciseId: widget.exercise.exerciseId,
+      targetReps: widget.exercise.targetReps ?? 0,
+    );
+    final s = ref.watch(smartTargetProvider(key)).valueOrNull;
+    if (s == null) return const SizedBox.shrink();
+
+    final (color, icon) = switch (s.action) {
+      ProgressionAction.increase => (scheme.primary, Icons.trending_up),
+      ProgressionAction.maintain => (scheme.tertiary, Icons.trending_flat),
+      ProgressionAction.deload => (scheme.error, Icons.trending_down),
+    };
+    final pct = (s.confidence * 100).round();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: Spacing.sm),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.sm,
+          vertical: Spacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: Spacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Smart target: ${_suggestionTarget(s)}  ·  $pct%',
+                    style: text.labelLarge
+                        ?.copyWith(color: color, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    s.rationale,
+                    style:
+                        text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            if (s.targetReps != null)
+              TextButton(
+                onPressed: () => _applySuggestion(s),
+                child: const Text('Apply'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _suggestionTarget(ProgressionSuggestion s) {
+    final reps = s.targetReps;
+    final kg = s.targetAddedWeightKg;
+    if (reps != null && kg != null && kg > 0) {
+      return '$reps reps @ ${kg.toStringAsFixed(kg % 1 == 0 ? 0 : 1)} kg';
+    }
+    if (reps != null) return '$reps reps';
+    return switch (s.action) {
+      ProgressionAction.increase => 'progress',
+      ProgressionAction.maintain => 'hold',
+      ProgressionAction.deload => 'back off',
+    };
+  }
+
+  void _applySuggestion(ProgressionSuggestion s) {
+    setState(() {
+      if (s.targetReps != null) _reps = s.targetReps!;
+      if (s.targetAddedWeightKg != null) _weight = s.targetAddedWeightKg!;
+      _seeded = true; // don't let the last-time seed overwrite the applied value
+    });
+  }
 }
 
 class _Stepper extends StatelessWidget {

@@ -6,10 +6,17 @@ class LoggedSet {
     this.holdSeconds,
     this.distanceMeters,
     this.durationSeconds,
+    this.rir,
   });
 
   final int reps;
   final double addedWeightKg;
+
+  /// Reps in reserve (how many more reps the user felt they could do) for this
+  /// set — an optional effort/autoregulation signal. Null when not recorded;
+  /// the on-device progression model uses it when present and assumes a
+  /// moderate default otherwise, so logging it is never required.
+  final int? rir;
 
   /// For isometric/hold exercises; null otherwise.
   final int? holdSeconds;
@@ -32,6 +39,7 @@ class LoggedSet {
         holdSeconds: (json['holdSeconds'] as num?)?.toInt(),
         distanceMeters: (json['distanceMeters'] as num?)?.toInt(),
         durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
+        rir: (json['rir'] as num?)?.toInt(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -40,6 +48,7 @@ class LoggedSet {
         if (holdSeconds != null) 'holdSeconds': holdSeconds,
         if (distanceMeters != null) 'distanceMeters': distanceMeters,
         if (durationSeconds != null) 'durationSeconds': durationSeconds,
+        if (rir != null) 'rir': rir,
       };
 
   LoggedSet copyWith({
@@ -48,6 +57,7 @@ class LoggedSet {
     int? holdSeconds,
     int? distanceMeters,
     int? durationSeconds,
+    int? rir,
   }) =>
       LoggedSet(
         reps: reps ?? this.reps,
@@ -55,6 +65,7 @@ class LoggedSet {
         holdSeconds: holdSeconds ?? this.holdSeconds,
         distanceMeters: distanceMeters ?? this.distanceMeters,
         durationSeconds: durationSeconds ?? this.durationSeconds,
+        rir: rir ?? this.rir,
       );
 }
 

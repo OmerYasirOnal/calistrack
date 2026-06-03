@@ -105,7 +105,9 @@ golden cases for the Dart parity test (T41).
   `docs/finance/`: (1) 18-month revenue scenarios low/base/high; (2) cumulative net cash incl.
   $25/$99 costs; (3) revenue mix subscription vs ads; (4) sensitivity conversion% → MRR; (5) funnel.
   Parameterized by **monthly installs** as scenarios (the largest unknown — ranges, not a point
-  estimate). Uses the §7 input table verbatim.
+  estimate). Uses the §7 inputs (rows 1–3, 5, 7–15); the §7 row-6 RLTV/payer is
+  an independent top-down cross-check, not a bound input (the bottom-up model
+  derives its own per-payer LTV from price × mix × churn).
 - **Roadmap:** `docs/finance/ROADMAP-FINANCIAL.md` — Mermaid gantt (Now → web/PWA → Android paywall →
   iOS) + the charts + a plain-language financial read.
 

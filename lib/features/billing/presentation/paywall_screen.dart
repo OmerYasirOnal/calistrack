@@ -114,6 +114,27 @@ class _PaywallBody extends ConsumerWidget {
     WidgetRef ref,
     PricingPlan plan,
   ) async {
+    // In a real release build the demo unlock is disabled (it would otherwise
+    // hand out Pro for free), so explain that billing isn't wired yet.
+    if (!demoUnlockAllowed) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('${plan.title} — ${plan.priceUsd}'),
+          content: const Text(
+            'Purchases are not available in this build yet. Store billing is '
+            'wired by the owner (RevenueCat + store products) before launch.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     final unlock = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -259,16 +280,17 @@ class _ProActive extends ConsumerWidget {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'AI programs, full skill-trees, advanced analytics, and no ads are '
-              'unlocked.',
+              'AI program generation and an ad-free experience are unlocked.',
               textAlign: TextAlign.center,
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
-            const SizedBox(height: Spacing.lg),
-            OutlinedButton(
-              onPressed: () => ref.read(entitlementProvider.notifier).lock(),
-              child: const Text('Switch back to Free (demo)'),
-            ),
+            if (demoUnlockAllowed) ...[
+              const SizedBox(height: Spacing.lg),
+              OutlinedButton(
+                onPressed: () => ref.read(entitlementProvider.notifier).lock(),
+                child: const Text('Switch back to Free (demo)'),
+              ),
+            ],
           ],
         ),
       ),

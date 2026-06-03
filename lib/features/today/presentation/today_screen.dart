@@ -8,6 +8,7 @@ import '../../../models/program.dart';
 import '../../ads/application/ad_service.dart';
 import '../../billing/application/entitlement.dart';
 import '../../programs/application/program_providers.dart';
+import '../../progress/application/smart_target.dart';
 import '../../workout/application/workout_session.dart';
 import '../../workout/data/training_defaults.dart';
 import '../../exercises/data/exercise_repository.dart';
@@ -92,6 +93,9 @@ class _ActiveDayState extends ConsumerState<_ActiveDay> {
       final workout = await ref.read(workoutSessionProvider.notifier).finish();
       if (!mounted) return;
       if (workout != null) {
+        // The just-saved session changes the last-time + Smart-target inputs.
+        ref.invalidate(lastSetsForProvider);
+        ref.invalidate(smartTargetProvider);
         await showSessionSummary(context, workout);
         // Count this session and maybe show an interstitial — free users only
         // (Pro removes ads), capped, no-op on web/desktop/tests. Its own try so

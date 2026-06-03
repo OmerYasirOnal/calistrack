@@ -3,9 +3,13 @@
 CalisTrack — financial projection + charts.
 
 A transparent 18-month bottom-up model for the freemium (free+ads + Pro
-subscription) plan. Every assumption traces to the research brief
-(docs/strategy/2026-06-03-monetization-strategy-brief.md, §7). The single
-largest unknown — monthly organic installs — is run as THREE coherent scenarios
+subscription) plan. Assumptions trace to the research brief
+(docs/strategy/2026-06-03-monetization-strategy-brief.md, §7) — rows 1-3,5,7-15.
+The §7 row-6 RLTV/payer ($17/$35.64/$70) is an independent top-down cross-check,
+NOT a bound input: this model derives per-payer LTV from price x mix x churn, so
+its emergent LTV need not match row 6 exactly (BASE aligns; LOW/HIGH compress).
+The single largest unknown — monthly organic installs — is run as THREE coherent
+scenarios
 (LOW / BASE / HIGH), each bundling an install volume + conversion + ARPDAU +
 churn, so the output is a range, not a false point estimate.
 

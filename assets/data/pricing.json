@@ -1,10 +1,9 @@
 {
   "_comment": "CalisTrack Pro pricing + benefits. priceUsd is the anchor/high-geo price; priceTry is a store-native LOCAL tier for Turkey (NOT an FX conversion). Research-backed (docs/strategy/2026-06-03-monetization-strategy-brief.md). TODO(owner): map each plan id to a real RevenueCat/store product before charging.",
+  "_benefitsNote": "Only list benefits that are actually gated/shipped. Full skill-trees + advanced analytics are planned Pro features (see spec fast-follow) — re-add here when they're gated.",
   "proBenefits": [
     "AI-generated programs tailored to your level & goals",
-    "Full skill-trees: muscle-up, front lever, planche, handstand",
-    "Advanced progress & skill analytics",
-    "No ads"
+    "No ads — train uninterrupted"
   ],
   "plans": [
     {

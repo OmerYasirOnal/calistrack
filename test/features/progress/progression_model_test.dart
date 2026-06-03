@@ -101,6 +101,19 @@ void main() {
       expect(buildProgressionInput(const [], 'push_up', 10), isNull);
     });
 
+    test('top working set picks the heaviest set (reps + weight coherent)', () {
+      // 15 bodyweight reps + 5 reps @ 10kg: the model should read the heavy set.
+      final hist = [
+        wk('w1', 30, [
+          const LoggedSet(reps: 15),
+          const LoggedSet(reps: 5, addedWeightKg: 10),
+        ]),
+      ];
+      final input = buildProgressionInput(hist, 'push_up', 10)!;
+      expect(input.topRepsLast, 5); // reps from the heaviest set, not the 15
+      expect(input.lastTopWeightKg, 10);
+    });
+
     test('uses logged RIR and counts a single session as flat trend', () {
       final hist = [
         wk('w1', 30, [
@@ -157,6 +170,28 @@ void main() {
       final s = buildSuggestion(m, input, lastTopWeightKg: 0);
       expect(s.action, ProgressionAction.deload);
       expect(s.targetReps, 6);
+    });
+
+    const deloadInput = ProgressionInput(
+      topRepsLast: 8,
+      repHigh: 10,
+      sessionsAtTop: 0,
+      trend3: -2,
+      avgRir: 0,
+    );
+
+    test('deload, light weight -> drops toward bodyweight (always reduces)',
+        () {
+      // 0.9x rounds 2.5 back to 2.5; the fix must still reduce.
+      final s = buildSuggestion(m, deloadInput, lastTopWeightKg: 2.5);
+      expect(s.action, ProgressionAction.deload);
+      expect(s.targetAddedWeightKg, 0); // one step below 2.5 -> bodyweight
+    });
+
+    test('deload, heavier weight -> backs off at least one step', () {
+      final s = buildSuggestion(m, deloadInput, lastTopWeightKg: 10);
+      expect(s.targetAddedWeightKg, 7.5); // min(7.5, 9.0) -> 7.5
+      expect(s.targetAddedWeightKg, lessThan(10));
     });
 
     test('confidence is 1.0 for the heuristic model', () {

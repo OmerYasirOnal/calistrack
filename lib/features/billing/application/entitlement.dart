@@ -1,4 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// Whether the in-app demo unlock is permitted. TRUE only in debug builds or
+/// when the build is explicitly flagged a demo (`--dart-define=CALISTRACK_DEMO=true`,
+/// which the web/PWA preview build passes). In a real RELEASE build this is
+/// FALSE, so the "Unlock (demo)" path cannot bypass billing — Pro then comes
+/// only from a verified store purchase (the owner's RevenueCat step).
+const demoUnlockAllowed = kDebugMode || bool.fromEnvironment('CALISTRACK_DEMO');
 
 /// Where a Pro entitlement came from. `proStore` is the real path (a verified
 /// store purchase via RevenueCat); `proDemo` is the in-app demo unlock used by
@@ -35,9 +43,12 @@ class EntitlementController extends Notifier<Entitlement> {
   @override
   Entitlement build() => const Entitlement();
 
-  /// Demo-only: grant Pro without a purchase (web/PWA showcase).
-  void unlockProDemo() =>
-      state = const Entitlement(isPro: true, source: EntitlementSource.proDemo);
+  /// Demo-only: grant Pro without a purchase (web/PWA showcase). A no-op unless
+  /// [demoUnlockAllowed], so it can never bypass billing in a release build.
+  void unlockProDemo() {
+    if (!demoUnlockAllowed) return;
+    state = const Entitlement(isPro: true, source: EntitlementSource.proDemo);
+  }
 
   /// Demo-only: drop back to free.
   void lock() => state = const Entitlement();

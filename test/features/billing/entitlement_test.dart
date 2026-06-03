@@ -14,6 +14,12 @@ void main() {
       expect(c.read(adsEnabledProvider), isTrue);
     });
 
+    test('demo unlock is allowed under test (debug) so the showcase works', () {
+      // In a real release build this const is false (no --dart-define), which is
+      // what stops the demo unlock from bypassing billing in production.
+      expect(demoUnlockAllowed, isTrue);
+    });
+
     test('demo unlock grants Pro and removes ads, then lock reverts', () {
       final c = ProviderContainer();
       addTearDown(c.dispose);

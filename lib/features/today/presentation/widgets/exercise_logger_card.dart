@@ -42,6 +42,10 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
   late final LogMode _mode = logModeFor(widget.exercise);
   late int _reps = widget.exercise.targetReps ?? 10;
   double _weight = 0;
+
+  /// Reps-in-reserve for the next logged set (optional effort signal the
+  /// on-device model reads). Defaults to a moderate 2; seeded from last time.
+  int _rir = 2;
   late int _seconds = widget.exercise.targetHoldSeconds ??
       widget.exercise.targetDurationSeconds ??
       30;
@@ -57,6 +61,7 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
       case LogMode.reps:
         _reps = last.reps;
         _weight = last.addedWeightKg;
+        if (last.rir != null) _rir = last.rir!;
       case LogMode.hold:
         if (last.holdSeconds != null) _seconds = last.holdSeconds!;
       case LogMode.time:
@@ -68,7 +73,7 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
 
   void _log() {
     final set = switch (_mode) {
-      LogMode.reps => LoggedSet(reps: _reps, addedWeightKg: _weight),
+      LogMode.reps => LoggedSet(reps: _reps, addedWeightKg: _weight, rir: _rir),
       LogMode.hold => LoggedSet(reps: 1, holdSeconds: _seconds),
       LogMode.distance => LoggedSet(reps: 1, distanceMeters: _meters),
       LogMode.time => LoggedSet(reps: 1, durationSeconds: _seconds),
@@ -205,23 +210,36 @@ class _ExerciseLoggerCardState extends ConsumerState<ExerciseLoggerCard> {
 
   Widget _primaryInput() {
     return switch (_mode) {
-      LogMode.reps => Row(
-          children: [
-            _Stepper(
-              label: 'reps',
-              value: '$_reps',
-              onMinus: () => setState(() => _reps = (_reps - 1).clamp(0, 999)),
-              onPlus: () => setState(() => _reps = _reps + 1),
-            ),
-            const SizedBox(width: Spacing.md),
-            _Stepper(
-              label: 'kg',
-              value: _weight.toStringAsFixed(_weight % 1 == 0 ? 0 : 1),
-              onMinus: () =>
-                  setState(() => _weight = (_weight - 2.5).clamp(0, 999)),
-              onPlus: () => setState(() => _weight = _weight + 2.5),
-            ),
-          ],
+      // Horizontally scrollable so reps + kg + RIR never overflow on narrow
+      // phones.
+      LogMode.reps => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _Stepper(
+                label: 'reps',
+                value: '$_reps',
+                onMinus: () =>
+                    setState(() => _reps = (_reps - 1).clamp(0, 999)),
+                onPlus: () => setState(() => _reps = _reps + 1),
+              ),
+              const SizedBox(width: Spacing.md),
+              _Stepper(
+                label: 'kg',
+                value: _weight.toStringAsFixed(_weight % 1 == 0 ? 0 : 1),
+                onMinus: () =>
+                    setState(() => _weight = (_weight - 2.5).clamp(0, 999)),
+                onPlus: () => setState(() => _weight = _weight + 2.5),
+              ),
+              const SizedBox(width: Spacing.md),
+              _Stepper(
+                label: 'RIR',
+                value: '$_rir',
+                onMinus: () => setState(() => _rir = (_rir - 1).clamp(0, 10)),
+                onPlus: () => setState(() => _rir = (_rir + 1).clamp(0, 10)),
+              ),
+            ],
+          ),
         ),
       LogMode.hold || LogMode.time => _Stepper(
           label: 'sec',

@@ -16,6 +16,7 @@ class ProgressionInput {
     required this.sessionsAtTop,
     required this.trend3,
     required this.avgRir,
+    this.lastTopWeightKg = 0,
   });
 
   final double topRepsLast;
@@ -23,6 +24,11 @@ class ProgressionInput {
   final double sessionsAtTop;
   final double trend3;
   final double avgRir;
+
+  /// The added weight on the top working set last session (0 = bodyweight).
+  /// Context for the suggestion's load math — NOT a model feature, so it is
+  /// deliberately excluded from [base].
+  final double lastTopWeightKg;
 
   double get margin => topRepsLast - repHigh;
 

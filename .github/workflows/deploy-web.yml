@@ -33,6 +33,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Pinned for a reproducible public build; bump deliberately.
+          flutter-version: 3.38.9
           channel: stable
           cache: true
 
@@ -41,7 +43,9 @@ jobs:
 
       - name: Build web (preview demo target)
         # base-href matches the project Pages path: /<repo>/.
-        run: flutter build web --release -t lib/preview.dart --base-href /calistrack/
+        # CALISTRACK_DEMO enables the in-app Pro demo unlock for this showcase
+        # build only (release app builds omit it, so billing can't be bypassed).
+        run: flutter build web --release -t lib/preview.dart --base-href /calistrack/ --dart-define=CALISTRACK_DEMO=true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

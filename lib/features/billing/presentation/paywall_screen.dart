@@ -280,7 +280,8 @@ class _ProActive extends ConsumerWidget {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'AI program generation and an ad-free experience are unlocked.',
+              'AI programs, full skill-trees, advanced analytics, and an '
+              'ad-free experience are unlocked.',
               textAlign: TextAlign.center,
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),

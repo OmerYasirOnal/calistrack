@@ -38,6 +38,7 @@
     "id": "handstand",
     "name": "Handstand",
     "description": "A balanced inverted hold on the hands.",
+    "free": true,
     "steps": [
       { "id": "wall_plank", "name": "Wall plank", "description": "Feet on the wall, shoulders stacked.", "targetHoldSeconds": 40 },
       { "id": "wall_handstand", "name": "Wall handstand", "description": "Chest-to-wall hold.", "targetHoldSeconds": 40 },
@@ -49,6 +50,7 @@
     "id": "pistol_squat",
     "name": "Pistol Squat",
     "description": "A full single-leg squat.",
+    "free": true,
     "steps": [
       { "id": "assisted_pistol", "name": "Assisted pistol", "description": "Hold a support for balance.", "targetReps": 8 },
       { "id": "box_pistol", "name": "Box pistol", "description": "Sit to a box and stand on one leg.", "targetReps": 6 },

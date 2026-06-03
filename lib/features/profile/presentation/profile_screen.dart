@@ -153,8 +153,9 @@ class _ProCard extends ConsumerWidget {
             const SizedBox(height: Spacing.xs),
             Text(
               isPro
-                  ? 'AI program generation and an ad-free experience are active.'
-                  : 'Unlock AI program generation and remove ads.',
+                  ? 'AI programs, full skill-trees, advanced analytics, and no ads.'
+                  : 'Unlock AI programs, full skill-trees, advanced analytics, '
+                      'and remove ads.',
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: Spacing.sm),

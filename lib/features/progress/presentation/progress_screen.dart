@@ -9,7 +9,9 @@ import '../../../core/theme/app_theme.dart';
 import '../../../models/exercise.dart';
 import '../../ads/application/ad_service.dart';
 import '../../billing/application/entitlement.dart';
+import '../../billing/presentation/paywall_screen.dart';
 import '../../exercises/data/exercise_repository.dart';
+import '../application/advanced_stats.dart';
 import '../data/progress_repository.dart';
 
 /// The metric charted for an exercise, picked by how it's measured.
@@ -88,11 +90,125 @@ class _ProgressBodyState extends ConsumerState<_ProgressBody> {
                 ),
         ),
         const SizedBox(height: Spacing.lg),
+        const _AdvancedAnalytics(),
+        const SizedBox(height: Spacing.lg),
         // Banner ad — free users only (Pro removes ads), and a no-op SizedBox
         // on web/desktop/tests anyway.
         if (ref.watch(adsEnabledProvider))
           Center(child: ref.watch(adServiceProvider).banner()),
       ],
+    );
+  }
+}
+
+/// Pro-tier "Advanced analytics". Free users get a locked CTA to the paywall;
+/// Pro users get real computed insights over the last 30 days.
+class _AdvancedAnalytics extends ConsumerWidget {
+  const _AdvancedAnalytics();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final isPro = ref.watch(entitlementProvider).isPro;
+
+    if (!isPro) {
+      return Card(
+        color: scheme.surfaceContainerHighest,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Radii.card),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const PaywallScreen(
+                reason: 'Advanced analytics is a Pro feature.',
+              ),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.md),
+            child: Row(
+              children: [
+                Icon(Icons.insights, color: scheme.primary),
+                const SizedBox(width: Spacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Advanced analytics',
+                        style: text.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        '30-day volume, training frequency & your top movement '
+                        '— unlock with Pro.',
+                        style: text.bodySmall
+                            ?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.lock_outline),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final statsAsync = ref.watch(advancedStatsProvider);
+    final library = ref.watch(exerciseLibraryProvider).valueOrNull ?? const [];
+    return statsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (s) {
+        if (s.sessionsLast30 == 0) return const SizedBox.shrink();
+        final topId = s.topVolumeExerciseId;
+        final topName = topId == null
+            ? '—'
+            : library.firstWhereOrNull((e) => e.id == topId)?.name ?? topId;
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.insights, color: scheme.primary, size: 20),
+                    const SizedBox(width: Spacing.sm),
+                    Text(
+                      'Advanced analytics',
+                      style: text.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: Spacing.md),
+                Wrap(
+                  spacing: Spacing.xl,
+                  runSpacing: Spacing.md,
+                  children: [
+                    _Stat(
+                      value: '${s.sessionsLast30}',
+                      label: 'sessions / 30d',
+                    ),
+                    _Stat(
+                      value: s.avgPerWeek.toStringAsFixed(1),
+                      label: 'per week',
+                    ),
+                    _Stat(
+                      value: s.totalVolumeLast30.toStringAsFixed(0),
+                      label: '30d volume',
+                    ),
+                    _Stat(value: topName, label: 'top movement'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

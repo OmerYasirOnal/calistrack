@@ -24,5 +24,10 @@ functions/node_modules/
 functions/.env
 functions/lib/
 
+# Python ML/finance tooling (venv + caches; trained weights are committed as assets)
+tools/**/.venv/
+__pycache__/
+*.pyc
+
 # OS
 .DS_Store
